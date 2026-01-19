@@ -412,6 +412,15 @@ now();
 today();
 ```
 
+## Testing
+
+To run the test suite:
+
+```bash
+composer install
+vendor/bin/phpunit
+```
+
 ## License
 
 GPL-2.0-or-later
