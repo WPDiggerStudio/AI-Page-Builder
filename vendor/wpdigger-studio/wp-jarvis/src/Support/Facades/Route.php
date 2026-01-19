@@ -2,7 +2,7 @@
 
 namespace WPJarvis\Framework\Support\Facades;
 
-use Illuminate\Support\Facades\Facade;
+use WPJarvis\Framework\Support\Facades\ScopedFacade;
 
 /**
  * Route Facade
@@ -36,7 +36,7 @@ use Illuminate\Support\Facades\Facade;
  *
  * @see \Illuminate\Routing\Router
  */
-class Route extends Facade {
+class Route extends ScopedFacade {
 	/**
 	 * Get the registered name of the component.
 	 *

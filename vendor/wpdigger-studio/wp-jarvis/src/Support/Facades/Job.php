@@ -2,7 +2,7 @@
 
 namespace WPJarvis\Framework\Support\Facades;
 
-use Illuminate\Support\Facades\Facade;
+use WPJarvis\Framework\Support\Facades\ScopedFacade;
 
 /**
  * Job Facade
@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Facade;
  * @see \WPJarvis\Framework\Contracts\Queue
  * @package WPJarvis\Framework\Support\Facades
  */
-class Job extends Facade {
+class Job extends ScopedFacade {
 	/**
 	 * Get the registered name of the component.
 	 *

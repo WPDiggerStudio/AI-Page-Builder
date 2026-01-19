@@ -4,7 +4,7 @@ declare( strict_types=1 );
 
 namespace WPJarvis\Framework\Support\Facades;
 
-use Illuminate\Support\Facades\Facade;
+use WPJarvis\Framework\Support\Facades\ScopedFacade;
 
 /**
  * @method static \Illuminate\Database\Connection connection( string|null $name = null )
@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Facade;
  *
  * @see \Illuminate\Database\DatabaseManager
  */
-class DB extends Facade {
+class DB extends ScopedFacade {
 	protected static function getFacadeAccessor(): string {
 		return 'db';
 	}

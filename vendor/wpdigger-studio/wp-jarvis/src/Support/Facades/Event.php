@@ -4,7 +4,7 @@ declare( strict_types=1 );
 
 namespace WPJarvis\Framework\Support\Facades;
 
-use Illuminate\Support\Facades\Facade;
+use WPJarvis\Framework\Support\Facades\ScopedFacade;
 
 /**
  * @method static void listen( string|array $events, $listener = null )
@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Facade;
  *
  * @see \Illuminate\Events\Dispatcher
  */
-class Event extends Facade {
+class Event extends ScopedFacade {
 	protected static function getFacadeAccessor(): string {
 		return 'events';
 	}

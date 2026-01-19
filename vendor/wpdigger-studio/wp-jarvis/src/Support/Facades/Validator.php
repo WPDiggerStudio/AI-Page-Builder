@@ -4,7 +4,7 @@ declare( strict_types=1 );
 
 namespace WPJarvis\Framework\Support\Facades;
 
-use Illuminate\Support\Facades\Facade;
+use WPJarvis\Framework\Support\Facades\ScopedFacade;
 
 /**
  * @method static \Illuminate\Validation\Validator make( array $data, array $rules, array $messages = [], array $customAttributes = [] )
@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Facade;
  *
  * @see \Illuminate\Validation\Factory
  */
-class Validator extends Facade {
+class Validator extends ScopedFacade {
 	protected static function getFacadeAccessor(): string {
 		return 'validator';
 	}

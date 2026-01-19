@@ -4,7 +4,7 @@ declare( strict_types=1 );
 
 namespace WPJarvis\Framework\Support\Facades;
 
-use Illuminate\Support\Facades\Facade;
+use WPJarvis\Framework\Support\Facades\ScopedFacade;
 
 /**
  * @method static mixed make( string $abstract, array $parameters = [] )
@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Facade;
  *
  * @see \WPJarvis\Framework\Application
  */
-class App extends Facade {
+class App extends ScopedFacade {
 	protected static function getFacadeAccessor(): string {
 		return 'app';
 	}

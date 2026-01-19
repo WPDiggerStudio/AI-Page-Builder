@@ -4,7 +4,7 @@ declare( strict_types=1 );
 
 namespace WPJarvis\Framework\Support\Facades;
 
-use Illuminate\Support\Facades\Facade;
+use WPJarvis\Framework\Support\Facades\ScopedFacade;
 
 /**
  * @method static \Illuminate\Contracts\View\View make( string $view, array $data = [], array $mergeData = [] )
@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Facade;
  *
  * @see \Illuminate\View\Factory
  */
-class View extends Facade {
+class View extends ScopedFacade {
 	protected static function getFacadeAccessor(): string {
 		return 'view';
 	}

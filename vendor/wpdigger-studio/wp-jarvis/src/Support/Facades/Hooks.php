@@ -4,7 +4,7 @@ declare( strict_types=1 );
 
 namespace WPJarvis\Framework\Support\Facades;
 
-use Illuminate\Support\Facades\Facade;
+use WPJarvis\Framework\Support\Facades\ScopedFacade;
 use WPJarvis\Framework\WP\Hooks\Hooks as HooksManager;
 
 /**
@@ -26,7 +26,7 @@ use WPJarvis\Framework\WP\Hooks\Hooks as HooksManager;
  * @see HooksManager
  * @mixin HooksManager
  */
-class Hooks extends Facade {
+class Hooks extends ScopedFacade {
 	protected static function getFacadeAccessor(): string {
 		return 'hooks';
 	}

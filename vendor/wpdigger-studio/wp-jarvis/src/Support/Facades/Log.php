@@ -4,7 +4,7 @@ declare( strict_types=1 );
 
 namespace WPJarvis\Framework\Support\Facades;
 
-use Illuminate\Support\Facades\Facade;
+use WPJarvis\Framework\Support\Facades\ScopedFacade;
 
 /**
  * @method static void emergency( string $message, array $context = [] )
@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Facade;
  *
  * @see \Illuminate\Log\LogManager
  */
-class Log extends Facade {
+class Log extends ScopedFacade {
 	protected static function getFacadeAccessor(): string {
 		return 'log';
 	}
