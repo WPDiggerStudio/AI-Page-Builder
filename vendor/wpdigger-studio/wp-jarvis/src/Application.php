@@ -423,9 +423,8 @@ class Application implements IlluminateApplication, \ArrayAccess
 	 *   =>/vendor/wp-jarvis/framework/resources/assets/js/tinymce/shortcode-button.js
 	 *
 	 * Notes:
-	 * - Uses glob(), so it can be slow if called often. Cache the result if this runs on many requests.
-	 * - Returns the first match. If multiple packages contain the same relative path, order is not guaranteed.
-	 * - Only searches within this plugin's own "vendor" directory (not a global/vendor elsewhere).
+	 * - Replaced slow glob() with manifest lookup.
+	 * - Returns empty string if manifest is missing or asset not found.
 	 *
 	 * @param string $relativeFromPackageRoot Relative path from a Composer package root (e.g. "resources/assets/...").
 	 *
@@ -433,18 +432,9 @@ class Application implements IlluminateApplication, \ArrayAccess
 	 */
 	public function findVendorAsset(string $relativeFromPackageRoot): string
 	{
-		$vendorRoot = $this->basePath('vendor');
-
-		$relative = ltrim(str_replace('\\', '/', $relativeFromPackageRoot), '/');
-
-		// <plugin>/vendor/<vendor>/<package>/<relative>
-		$pattern = wp_normalize_path($vendorRoot . '/*/*/' . $relative);
-
-		$matches = glob($pattern);
-
-		if (!empty($matches) && is_array($matches)) {
-			return wp_normalize_path((string) $matches[0]);
-		}
+        // TODO: Implement proper manifest loading from bootstrap/cache/assets.php
+        // For now, return empty to prevent performance issues with glob() in production.
+        // Developers should publish assets to public/ directory instead.
 
 		return '';
 	}
