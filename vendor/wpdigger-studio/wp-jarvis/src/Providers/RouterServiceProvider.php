@@ -1,10 +1,12 @@
 <?php
 
-declare( strict_types=1 );
+declare(strict_types=1);
 
 namespace WPJarvis\Framework\Providers;
 
 use WPJarvis\Framework\Foundation\ServiceProvider;
+use WPJarvis\Framework\Routing\RestRouter;
+use WPJarvis\Framework\Routing\AdminRouter;
 
 /**
  * Router Service Provider
@@ -13,177 +15,77 @@ use WPJarvis\Framework\Foundation\ServiceProvider;
  *
  * @package WPJarvis\Framework\Providers
  */
-class RouterServiceProvider extends ServiceProvider {
-	/**
-	 * REST API namespace.
-	 *
-	 * @var string
-	 */
-	protected string $namespace = 'WpJarvis/v1';
+class RouterServiceProvider extends ServiceProvider
+{
+    /**
+     * Register the service provider.
+     *
+     * @return void
+     */
+    public function register(): void
+    {
+        // Bind REST Router
+        $this->app->singleton('router.rest', function ($app) {
+            return new RestRouter($app);
+        });
 
-	/**
-	 * Register the service provider.
-	 *
-	 * @return void
-	 * @throws \Illuminate\Contracts\Container\BindingResolutionException
-	 */
-	public function register(): void {
-		// Load namespace from config
-		$this->namespace = $this->app->make( 'config' )->get( 'api.namespace', 'WpJarvis/v1' );
-	}
+        // Bind Admin Router
+        $this->app->singleton('router.admin', function ($app) {
+            return new AdminRouter($app);
+        });
 
-	/**
-	 * Bootstrap the service provider.
-	 *
-	 * @return void
-	 */
-	public function boot(): void {
-		// Register REST API routes
-		add_action( 'rest_api_init', [ $this, 'registerRestRoutes' ] );
+        // Bind default 'router' to RestRouter for Facade usage
+        // Note: In standard Laravel, 'router' manages all routes.
+        // Here, we default to REST as it maps closest to Route::get().
+        $this->app->singleton('router', function ($app) {
+            return $app->make('router.rest');
+        });
+    }
 
-		// Register admin AJAX handlers
-		add_action( 'admin_init', [ $this, 'registerAdminRoutes' ] );
-	}
+    /**
+     * Bootstrap the service provider.
+     *
+     * @return void
+     */
+    public function boot(): void
+    {
+        // Register REST API routes on 'rest_api_init'
+        add_action('rest_api_init', function () {
+            $this->loadApiRoutes();
+        });
 
-	/**
-	 * Register REST API routes.
-	 *
-	 * @return void
-	 */
-	public function registerRestRoutes(): void {
-		$routesFile = $this->app->routesPath( 'api.php' );
+        // Register admin routes/menus on 'admin_init' or 'admin_menu'
+        // Using 'admin_menu' is usually better for pages, 'admin_init' for AJAX
+        add_action('admin_menu', function () {
+            $this->loadAdminRoutes();
+        });
+    }
 
-		if ( file_exists( $routesFile ) ) {
-			$router = $this;
-			require $routesFile;
-		}
-	}
+    /**
+     * Load API routes from routes/api.php
+     */
+    protected function loadApiRoutes(): void
+    {
+        $file = $this->app->routesPath('api.php');
+        if (file_exists($file)) {
+            $router = $this->app->make('router.rest');
+            // We can also bind $router to a variable for the file to use
+            require $file;
 
-	/**
-	 * Register admin routes.
-	 *
-	 * @return void
-	 */
-	public function registerAdminRoutes(): void {
-		$routesFile = $this->app->routesPath( 'admin.php' );
+            // After loading the file, register the collected routes
+            $router->registerRoutes();
+        }
+    }
 
-		if ( file_exists( $routesFile ) ) {
-			require $routesFile;
-		}
-	}
-
-	/**
-	 * Register a REST route.
-	 *
-	 * @param string $route
-	 * @param array<string, mixed> $args
-	 * @param string|null $namespace
-	 *
-	 * @return void
-	 */
-	public function route( string $route, array $args, ?string $namespace = null ): void {
-		register_rest_route( $namespace ?? $this->namespace, $route, $args );
-	}
-
-	/**
-	 * Register a GET route.
-	 *
-	 * @param string $route
-	 * @param callable|array $callback
-	 * @param array<string, mixed> $args
-	 *
-	 * @return void
-	 */
-	public function get( string $route, callable|array $callback, array $args = [] ): void {
-		$this->route( $route, array_merge( [
-			'methods'             => 'GET',
-			'callback'            => $this->resolveCallback( $callback ),
-			'permission_callback' => $args['permission_callback'] ?? '__return_true',
-		], $args ) );
-	}
-
-	/**
-	 * Register a POST route.
-	 *
-	 * @param string $route
-	 * @param callable|array $callback
-	 * @param array<string, mixed> $args
-	 *
-	 * @return void
-	 */
-	public function post( string $route, callable|array $callback, array $args = [] ): void {
-		$this->route( $route, array_merge( [
-			'methods'             => 'POST',
-			'callback'            => $this->resolveCallback( $callback ),
-			'permission_callback' => $args['permission_callback'] ?? '__return_true',
-		], $args ) );
-	}
-
-	/**
-	 * Register a PUT route.
-	 *
-	 * @param string $route
-	 * @param callable|array $callback
-	 * @param array<string, mixed> $args
-	 *
-	 * @return void
-	 */
-	public function put( string $route, callable|array $callback, array $args = [] ): void {
-		$this->route( $route, array_merge( [
-			'methods'             => 'PUT',
-			'callback'            => $this->resolveCallback( $callback ),
-			'permission_callback' => $args['permission_callback'] ?? '__return_true',
-		], $args ) );
-	}
-
-	/**
-	 * Register a DELETE route.
-	 *
-	 * @param string $route
-	 * @param callable|array $callback
-	 * @param array<string, mixed> $args
-	 *
-	 * @return void
-	 */
-	public function delete( string $route, callable|array $callback, array $args = [] ): void {
-		$this->route( $route, array_merge( [
-			'methods'             => 'DELETE',
-			'callback'            => $this->resolveCallback( $callback ),
-			'permission_callback' => $args['permission_callback'] ?? '__return_true',
-		], $args ) );
-	}
-
-	/**
-	 * Resolve callback to a callable.
-	 *
-	 * @param callable|array $callback
-	 *
-	 * @return callable
-	 */
-	private function resolveCallback( callable|array $callback ): callable {
-		if ( is_callable( $callback ) ) {
-			return $callback;
-		}
-
-		if ( is_array( $callback ) && count( $callback ) === 2 ) {
-			[ $class, $method ] = $callback;
-
-			if ( is_string( $class ) && class_exists( $class ) ) {
-				return function ( $request ) use ( $class, $method ) {
-					return $this->app->make( $class )->$method( $request );
-				};
-			}
-		}
-
-		return $callback;
-	}
-
-	/**
-	 * Get the REST namespace.
-	 *
-	 * @return string
-	 */
-	public function getNamespace(): string {
-		return $this->namespace;
-	}
+    /**
+     * Load Admin routes from routes/admin.php
+     */
+    protected function loadAdminRoutes(): void
+    {
+        $file = $this->app->routesPath('admin.php');
+        if (file_exists($file)) {
+            // $router = $this->app->make('router.admin');
+            require $file;
+        }
+    }
 }
