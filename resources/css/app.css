@@ -1,0 +1,85 @@
+/**
+ * WP Jarvis - Frontend Styles
+ *
+ * @package BraCalculator
+ */
+
+/* Base styles */
+.wpjarvis-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Portfolio Grid */
+.portfolio-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.portfolio-item {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.portfolio-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.portfolio-thumbnail img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.portfolio-content {
+    padding: 20px;
+}
+
+.portfolio-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.portfolio-excerpt {
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.portfolio-link {
+    display: inline-block;
+    padding: 8px 16px;
+    background: #0073aa;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background 0.3s ease;
+}
+
+.portfolio-link:hover {
+    background: #005177;
+    color: #fff;
+}
+
+/* Shortcode styles */
+.shortcode-container {
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 4px;
+    background: #f5f5f5;
+}
+
+/* Widget styles */
+.widget-wpjarvis {
+    padding: 15px;
+}
+
+.widget-wpjarvis h3 {
+    margin-top: 0;
+}

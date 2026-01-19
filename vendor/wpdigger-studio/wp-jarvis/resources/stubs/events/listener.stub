@@ -1,0 +1,66 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ namespace }};
+
+use {{ eventNamespace }};
+
+/**
+ * {{ class }} Listener
+ *
+ * Handles the {{ event }} event.
+ *
+ * @package {{ namespace }}
+ */
+class {{ class }}
+{
+    /**
+     * Create the event listener.
+     */
+    public function __construct()
+    {
+        // Inject dependencies here if needed
+    }
+
+    /**
+     * Handle the event.
+     *
+     * @param {{ event }} ${{ eventVariable }}
+     * @return void
+     */
+    public function handle({{ event }} ${{ eventVariable }}): void
+    {
+        // Handle the event
+        // Access event data: ${{ eventVariable }}->data
+        // Or use getter: ${{ eventVariable }}->get('key')
+    }
+
+    /**
+     * Register this listener.
+     *
+     * @return void
+     */
+    public static function register(): void
+    {
+        {{ event }}::listen([new static(), 'handle']);
+    }
+
+    /**
+     * Handle a job failure.
+     *
+     * @param {{ event }} ${{ eventVariable }}
+     * @param \Throwable $exception
+     * @return void
+     */
+    public function failed({{ event }} ${{ eventVariable }}, \Throwable $exception): void
+    {
+        // Handle listener failure
+        error_log(sprintf(
+            '[%s] Failed to handle %s: %s',
+            static::class,
+            {{ event }}::class,
+            $exception->getMessage()
+        ));
+    }
+}

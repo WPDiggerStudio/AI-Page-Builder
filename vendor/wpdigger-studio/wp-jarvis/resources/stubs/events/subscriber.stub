@@ -1,0 +1,42 @@
+<?php
+
+declare( strict_types=1 );
+
+namespace {{ namespace }};
+
+use WPJarvis\Framework\Events\Dispatcher;
+
+/**
+ * {{ class }} Subscriber
+ *
+ * Event subscriber for handling multiple related events.
+ *
+ * @package {{ namespace }}
+ */
+class {{ class }} {
+	/**
+	 * Subscribe to events.
+	 *
+	 * @param Dispatcher $events The event dispatcher instance.
+	 *
+	 * @return void
+	 */
+	public function subscribe( Dispatcher $events ): void {
+		// Register your event listeners here
+		// Example:
+		// $events->listen( UserRegistered::class, [ $this, 'onUserRegistered' ] );
+		// $events->listen( UserUpdated::class, [ $this, 'onUserUpdated' ] );
+	}
+
+	/**
+	 * Handle user registered event.
+	 *
+	 * @param object $event The event instance.
+	 *
+	 * @return void
+	 */
+	// Example handler method:
+	// public function onUserRegistered( object $event ): void {
+	// 	// Handle the event
+	// }
+}

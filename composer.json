@@ -1,0 +1,36 @@
+{
+  "name": "wp-jarvis/wp-jarvis",
+  "description": "A Laravel-first application framework for WordPress",
+  "type": "wordpress-plugin",
+  "version": "2.0.0",
+  "license": "GPL-2.0-or-later",
+  "require": {
+    "php": "^8.1",
+    "wpdigger-studio/wp-jarvis": "^1.0"
+  },
+  "require-dev": {
+  },
+  "autoload": {
+    "psr-4": {
+      "BraCalculator\\App\\": "app/"
+    }
+  },
+  "repositories": [
+    {
+      "type": "path",
+      "url": "vendor/wpdigger-studio/wp-jarvis",
+      "options": {
+        "symlink": false
+      }
+    }
+  ],
+  "config": {
+    "optimize-autoloader": true,
+    "sort-packages": true,
+    "allow-plugins": {
+      "composer/installers": true
+    }
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
+}

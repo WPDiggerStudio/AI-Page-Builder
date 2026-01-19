@@ -1,0 +1,62 @@
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+/**
+ * {{ class }} Migration
+ *
+ * Creates {{ table }} table.
+ *
+ * @package {{ namespace }}
+ */
+return new class extends Migration
+{
+    /**
+     * Run the migration.
+     *
+     * Creates the {{ table }} table with all necessary columns and indexes.
+     *
+     * @return void
+     */
+    public function up(): void
+    {
+        Schema::create('{{ table }}', function (Blueprint $table) {
+            // Primary key
+            $table->id();
+
+            // Basic columns
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->text('description')->nullable();
+            $table->boolean('is_active')->default(true);
+
+            // JSON column for settings/metadata
+            $table->json('settings')->nullable();
+
+            // Timestamps
+            $table->timestamps();
+            $table->softDeletes();
+
+            // Add indexes for better query performance
+            $table->index('is_active');
+            $table->index('email');
+            $table->index('created_at');
+        });
+    }
+
+    /**
+     * Reverse the migration.
+     *
+     * Drops the {{ table }} table.
+     *
+     * @return void
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('{{ table }}');
+    }
+};

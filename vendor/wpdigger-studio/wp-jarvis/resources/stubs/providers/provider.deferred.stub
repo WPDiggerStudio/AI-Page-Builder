@@ -1,0 +1,64 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ namespace }};
+
+use WPJarvis\Framework\Foundation\ServiceProvider;
+
+/**
+ * {{ class }}
+ *
+ * A deferred service provider that only loads when its services are needed.
+ *
+ * @package {{ namespace }}
+ */
+class {{ class }} extends ServiceProvider
+{
+    /**
+     * Indicates if loading of the provider is deferred.
+     */
+    protected bool $defer = true;
+
+    /**
+     * Register the service provider.
+     */
+    public function register(): void
+    {
+        $this->app->singleton('{{ slug }}', function ($app) {
+            // Return your service instance
+            // return new YourService($app);
+        });
+    }
+
+    /**
+     * Bootstrap the application services.
+     */
+    public function boot(): void
+    {
+        // Only called when service is resolved
+    }
+
+    /**
+     * Get the services provided by the provider.
+     *
+     * These are the keys that will trigger loading of this provider.
+     *
+     * @return array<string>
+     */
+    public function provides(): array
+    {
+        return [
+            '{{ slug }}',
+            // Add other service keys here
+        ];
+    }
+
+    /**
+     * Determine if the provider is deferred.
+     */
+    public function isDeferred(): bool
+    {
+        return $this->defer;
+    }
+}

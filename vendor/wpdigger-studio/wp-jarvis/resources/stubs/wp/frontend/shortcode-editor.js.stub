@@ -1,0 +1,146 @@
+/**
+ * TinyMCE Plugin: {{ class }} Shortcode Button
+ *
+ * Provides a toolbar button for inserting [{{ shortcode_tag }}] shortcode
+ * with a configuration dialog for setting attributes.
+ *
+ * @package {{ namespace }}
+ */
+(function() {
+    'use strict';
+
+    tinymce.PluginManager.add('wpjarvis_sc_{{ shortcode_tag }}', function(editor, url) {
+        // Shortcode configuration
+        var shortcode = {
+            tag: '{{ shortcode_tag }}',
+            title: '{{ title }}',
+            allowContent: {{ allow_content_js }},
+            attributes: {{ attributes_json }}
+        };
+
+        /**
+         * Build form fields from attribute schema
+         */
+        function buildFormBody() {
+            var body = [];
+
+            Object.keys(shortcode.attributes).forEach(function(name) {
+                var attr = shortcode.attributes[name];
+                var field = {
+                    name: name,
+                    label: attr.description || name.replace(/_/g, ' ').replace(/\b\w/g, function(l) { return l.toUpperCase(); })
+                };
+
+                // Map type to TinyMCE field type
+                switch (attr.type) {
+                    case 'textarea':
+                    case 'html':
+                        field.type = 'textbox';
+                        field.multiline = true;
+                        field.minHeight = 100;
+                        break;
+
+                    case 'select':
+                        field.type = 'listbox';
+                        field.values = (attr.options || []).map(function(opt) {
+                            return { text: opt, value: opt };
+                        });
+                        break;
+
+                    case 'boolean':
+                    case 'bool':
+                        field.type = 'checkbox';
+                        field.checked = attr.default === true || attr.default === 'true';
+                        break;
+
+                    case 'color':
+                        field.type = 'colorbox';
+                        break;
+
+                    default:
+                        field.type = 'textbox';
+                }
+
+                // Set default value
+                if (attr.default !== undefined && field.type !== 'checkbox') {
+                    field.value = attr.default;
+                }
+
+                body.push(field);
+            });
+
+            // Add content field if shortcode allows content
+            if (shortcode.allowContent) {
+                body.push({
+                    name: '_content',
+                    type: 'textbox',
+                    label: 'Content',
+                    multiline: true,
+                    minHeight: 100,
+                    value: ''
+                });
+            }
+
+            return body;
+        }
+
+        /**
+         * Build shortcode string from dialog values
+         */
+        function buildShortcode(values) {
+            var sc = '[' + shortcode.tag;
+            var content = null;
+
+            Object.keys(values).forEach(function(key) {
+                var value = values[key];
+
+                if (key === '_content') {
+                    content = value;
+                    return;
+                }
+
+                // Skip empty values
+                if (value === '' || value === undefined || value === null) {
+                    return;
+                }
+
+                // Handle boolean
+                if (typeof value === 'boolean') {
+                    value = value ? 'true' : 'false';
+                }
+
+                // Skip default values
+                var attr = shortcode.attributes[key];
+                if (attr && String(value) === String(attr.default)) {
+                    return;
+                }
+
+                sc += ' ' + key + '="' + value + '"';
+            });
+
+            sc += ']';
+
+            if (content && shortcode.allowContent) {
+                sc += content + '[/' + shortcode.tag + ']';
+            }
+
+            return sc;
+        }
+
+        // Add button
+        editor.addButton('wpjarvis_sc_{{ shortcode_tag }}', {
+            title: shortcode.title,
+            icon: 'shortcode',
+            onclick: function() {
+                editor.windowManager.open({
+                    title: 'Insert ' + shortcode.title,
+                    body: buildFormBody(),
+                    onsubmit: function(e) {
+                        var sc = buildShortcode(e.data);
+                        editor.insertContent(sc);
+                    }
+                });
+            }
+        });
+    });
+})();

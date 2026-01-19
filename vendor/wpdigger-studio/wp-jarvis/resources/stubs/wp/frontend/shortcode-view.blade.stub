@@ -1,0 +1,25 @@
+@php
+/**
+ * {{ class }} Shortcode View Template
+ *
+ * Available variables:
+ * @var array<string, mixed> $atts Shortcode attributes
+ * @var string|null $content Shortcode content
+ *
+ * @package {{ namespace }}
+ */
+@endphp
+
+<div @if(!empty($atts['id'])) id="{{ esc_attr($atts['id']) }}" @endif class="{{ shortcode_tag }}-shortcode {{ !empty($atts['class']) ? esc_attr($atts['class']) : '' }}">
+    @if(!empty($atts['title']))
+        <h3 class="{{ shortcode_tag }}-title">{{ esc_html($atts['title']) }}</h3>
+    @endif
+
+    @if($content)
+        <div class="{{ shortcode_tag }}-content">
+            {!! $content !!}
+        </div>
+    @endif
+
+    {{-- Add your custom content here --}}
+</div>

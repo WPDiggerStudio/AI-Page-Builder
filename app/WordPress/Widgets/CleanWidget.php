@@ -1,0 +1,218 @@
+<?php
+
+declare( strict_types=1 );
+
+namespace BraCalculator\App\WordPress\Widgets;
+
+use WPJarvis\Framework\WP\Frontend\Widget as WidgetBuilder;
+use WPJarvis\Framework\WP\Frontend\WidgetAdapter;
+
+/**
+ * CleanWidget Widget
+ *
+ * A custom widget for Clean Widget Widget.
+ *
+ * @package BraCalculator\App\WordPress\Widgets
+ */
+class CleanWidget {
+	/**
+	 * Widget ID.
+	 */
+	public const ID = 'clean_widget_widget';
+
+	/**
+	 * Widget title.
+	 */
+	public const TITLE = 'Clean Widget Widget';
+
+	/**
+	 * The widget builder instance.
+	 *
+	 * @var WidgetBuilder|null
+	 */
+	private ?WidgetBuilder $widget = null;
+
+	/**
+	 * Define widget fields.
+	 *
+	 * Each field: type, id, label, and optional description/options.
+	 *
+	 * For column layouts, add 'row' and 'col_class':
+	 *   'row' => 'row_name' // Fields with same row name appear side-by-side
+	 *   'col_class' => 'wpj-col-half' // Column width (wpj-col-half, wpj-col-third, wpj-col-quarter)
+	 *
+	 * @return array<int, array<string, mixed>> Array of field definitions.
+	 */
+	protected function fields(): array {
+		return [
+			[
+				'type'    => 'text',
+				'id'      => 'title',
+				'label'   => __( 'Title', 'bra-calculator' ),
+				'default' => '',
+			],
+			[
+				'type'        => 'textarea',
+				'id'          => 'content',
+				'label'       => __( 'Content', 'bra-calculator' ),
+				'description' => __( 'Enter the widget content.', 'bra-calculator' ),
+			],
+			[
+				'type'    => 'number',
+				'id'      => 'count',
+				'label'   => __( 'Number of items', 'bra-calculator' ),
+				'default' => 5,
+				'min'     => 1,
+				'max'     => 20,
+			],
+			[
+				'type'  => 'checkbox',
+				'id'    => 'show_border',
+				'label' => __( 'Show border', 'bra-calculator' ),
+			],
+		];
+	}
+
+	/**
+	 * Register widget.
+	 *
+	 * @return void
+	 * @throws \Illuminate\Contracts\Container\BindingResolutionException
+	 */
+	public function register(): void {
+		$this->widget = WidgetBuilder::make( self::ID, __( self::TITLE, 'bra-calculator' ) )
+		                             ->description( __( 'A custom widget.', 'bra-calculator' ) );
+
+		// Register fields from the fields() method
+		foreach ( $this->fields() as $field ) {
+			$this->widget->field(
+				$field['type'],
+				$field['id'],
+				$field['label'],
+				array_diff_key( $field, array_flip( [ 'type', 'id', 'label' ] ) )
+			);
+		}
+
+		// Set callbacks
+		$this->widget
+			->render( [ $this, 'render' ] )
+			->form( [ $this, 'renderForm' ] )
+			->update( [ $this, 'update' ] );
+
+		// Register the widget with WordPress
+		$this->widget->register();
+	}
+
+	/**
+	 * Front-end display of widget.
+	 *
+	 * @param array<string, mixed> $args Widget arguments.
+	 * @param array<string, mixed> $instance Saved values from a database.
+	 *
+	 * @return string Rendered HTML.
+	 */
+	public function render( array $args, array $instance ): string {
+		$output = '';
+		$output .= $args['before_widget'] ?? '';
+
+		// Title
+		if ( ! empty( $instance['title'] ) ) {
+			$output .= $args['before_title'] ?? '';
+			$output .= esc_html( $instance['title'] );
+			$output .= $args['after_title'] ?? '';
+		}
+
+		// Widget content wrapper
+		$class = 'widget-clean_widget_widget-content';
+		if ( ! empty( $instance['show_border'] ) ) {
+			$class .= ' has-border';
+		}
+
+		$output .= '<div class="' . esc_attr( $class ) . '">';
+
+		// Render content
+		if ( ! empty( $instance['content'] ) ) {
+			$output .= wp_kses_post( $instance['content'] );
+		}
+
+		// Display items count
+		$output .= '<p class="items-info">';
+		$output .= sprintf(
+			esc_html__( 'Displaying up to %d items.', 'bra-calculator' ),
+			absint( $instance['count'] ?? 5 )
+		);
+		$output .= '</p>';
+
+		$output .= '</div>';
+		$output .= $args['after_widget'] ?? '';
+
+		return $output;
+	}
+
+	/**
+	 * The back-end widget form - renders fields using the Field System.
+	 *
+	 * @param array<string, mixed> $instance Previously saved values from a database.
+	 * @param WidgetAdapter $adapter Widget adapter instance.
+	 *
+	 * @return string Form HTML.
+	 */
+	public function renderForm( array $instance, WidgetAdapter $adapter ): string {
+		return $this->widget?->renderFields( $instance, $adapter ) ?? '';
+	}
+
+	/**
+	 * Sanitize the widget form values as they are saved.
+	 *
+	 * @param array<string, mixed> $new_instance Values just sent to be saved.
+	 * @param array<string, mixed> $old_instance Previously saved values from a database.
+	 *
+	 * @return array<string, mixed> Updated safe values to be saved.
+	 */
+	public function update( array $new_instance, array $old_instance ): array {
+		return $this->widget?->sanitizeFields( $new_instance, $old_instance ) ?? [];
+	}
+
+	/**
+	 * Get the widget builder instance.
+	 *
+	 * @return WidgetBuilder|null The widget builder instance.
+	 */
+	public function getWidget(): ?WidgetBuilder {
+		return $this->widget;
+	}
+
+	/**
+	 * Get all fields configuration.
+	 *
+	 * @return array<string, array<string, mixed>> All fields configuration.
+	 */
+	public function getFields(): array {
+		return $this->widget?->getFields() ?? [];
+	}
+
+	/**
+	 * Get a field value from the widget instance.
+	 *
+	 * @param array<string, mixed> $instance Widget instance data.
+	 * @param string $key Field key.
+	 * @param mixed $default Default value.
+	 *
+	 * @return mixed Field value.
+	 */
+	public static function get( array $instance, string $key, mixed $default = null ): mixed {
+		return $instance[ $key ] ?? $default;
+	}
+
+	/**
+	 * Check if a field has a truthy value.
+	 *
+	 * @param array<string, mixed> $instance Widget instance data.
+	 * @param string $key Field key.
+	 *
+	 * @return bool True if value is truthy.
+	 */
+	public static function isTrue( array $instance, string $key ): bool {
+		return (bool) self::get( $instance, $key, false );
+	}
+}

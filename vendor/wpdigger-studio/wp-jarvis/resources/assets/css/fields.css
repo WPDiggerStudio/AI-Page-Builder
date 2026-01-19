@@ -1,0 +1,1801 @@
+/**
+ * WP Jarvis Field System Styles
+ *
+ * Field styling for WordPress admin screens.
+ * Uses CSS variables for easy theming.
+ */
+
+/* ==========================================================================
+   CSS Variables
+   ========================================================================== */
+:root {
+    /* Spacing */
+    --wpj-field-spacing: 15px;
+    --wpj-field-gap: 5px;
+    --wpj-field-label-width: 200px;
+
+    /* Colors */
+    --wpj-field-border-color: #dcdcde;
+    --wpj-field-bg-color: #fff;
+    --wpj-field-focus-color: #2271b1;
+    --wpj-field-error-color: #d63638;
+    --wpj-field-success-color: #00a32a;
+    --wpj-field-required-color: #d63638;
+    --wpj-field-description-color: #646970;
+    --wpj-field-label-color: #1d2327;
+    --wpj-field-disabled-bg: #f0f0f1;
+    --wpj-field-icon-color: #646970;
+    --wpj-field-toggle-color: #2271b1;
+
+    /* Typography */
+    --wpj-field-font-size: 14px;
+    --wpj-field-label-font-size: 14px;
+    --wpj-field-description-font-size: 13px;
+
+    /* Borders */
+    --wpj-field-border-radius: 4px;
+    --wpj-field-border-width: 1px;
+}
+
+/* ==========================================================================
+   Base Field Wrapper
+   ========================================================================== */
+.wpj-field {
+    margin-bottom: var(--wpj-field-spacing);
+    font-size: var(--wpj-field-font-size);
+}
+
+.wpj-field:last-child {
+    margin-bottom: 0;
+}
+
+/* ==========================================================================
+   Grid / Row / Column Layout (CMB2-grid style)
+   ========================================================================== */
+.wp-jarvis-metabox {
+    padding: 12px 0;
+}
+
+/* CMB2-grid style: rows contain columns, fields inside columns */
+.wpj-field-row {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -10px 15px -10px;
+    border-bottom: 1px solid #f0f0f1;
+}
+
+.wpj-field-row:last-child {
+    margin-bottom: 0;
+}
+
+/* Columns */
+.wpj-col,
+[class*="wpj-col-"] {
+    padding: 0 10px;
+    box-sizing: border-box;
+}
+
+/* Default column - equal width */
+.wpj-col {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+/* 12-column grid classes - no gap subtraction, use padding instead */
+.wpj-col-1 {
+    flex: 0 0 8.333%;
+    max-width: 8.333%;
+}
+
+.wpj-col-2 {
+    flex: 0 0 16.666%;
+    max-width: 16.666%;
+}
+
+.wpj-col-3 {
+    flex: 0 0 25%;
+    max-width: 25%;
+}
+
+.wpj-col-4 {
+    flex: 0 0 33.333%;
+    max-width: 33.333%;
+}
+
+.wpj-col-5 {
+    flex: 0 0 41.666%;
+    max-width: 41.666%;
+}
+
+.wpj-col-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+}
+
+.wpj-col-7 {
+    flex: 0 0 58.333%;
+    max-width: 58.333%;
+}
+
+.wpj-col-8 {
+    flex: 0 0 66.666%;
+    max-width: 66.666%;
+}
+
+.wpj-col-9 {
+    flex: 0 0 75%;
+    max-width: 75%;
+}
+
+.wpj-col-10 {
+    flex: 0 0 83.333%;
+    max-width: 83.333%;
+}
+
+.wpj-col-11 {
+    flex: 0 0 91.666%;
+    max-width: 91.666%;
+}
+
+.wpj-col-12 {
+    flex: 0 0 100%;
+    max-width: 100%;
+}
+
+/* Shortcut classes */
+.wpj-col-half {
+    flex: 0 0 50%;
+    max-width: 50%;
+}
+
+.wpj-col-third {
+    flex: 0 0 33.333%;
+    max-width: 33.333%;
+}
+
+.wpj-col-two-thirds {
+    flex: 0 0 66.666%;
+    max-width: 66.666%;
+}
+
+.wpj-col-quarter {
+    flex: 0 0 25%;
+    max-width: 25%;
+}
+
+.wpj-col-three-quarters {
+    flex: 0 0 75%;
+    max-width: 75%;
+}
+
+/* Fields in rows: stacked layout with left-aligned labels */
+.wpj-field-row .wpj-field {
+    margin-bottom: 0;
+}
+
+.wpj-field-row .wpj-field--layout-inline {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.wpj-field-row .wpj-field--layout-inline .wpj-field__label {
+    flex: 0 0 auto;
+    width: auto;
+    padding: 0;
+    text-align: left;
+}
+
+.wpj-field-row .wpj-field--layout-inline .wpj-field__input {
+    flex: 1;
+    width: 100%;
+}
+
+.wpj-field-row .wpj-field--layout-inline .wpj-field__input input,
+.wpj-field-row .wpj-field--layout-inline .wpj-field__input select,
+.wpj-field-row .wpj-field--layout-inline .wpj-field__input textarea {
+    width: 100%;
+    max-width: 100%;
+}
+
+.wpj-field-row .wpj-field--layout-inline .wpj-field__description {
+    padding-left: 0;
+    width: fit-content;
+}
+
+/* Responsive: Stack on mobile */
+@media screen and (max-width: 782px) {
+    .wpj-field-row {
+        flex-direction: column;
+        margin: 0 0 15px 0;
+    }
+
+    .wpj-col,
+    [class*="wpj-col-"] {
+        flex: 0 0 100%;
+        max-width: 100%;
+        padding: 0;
+        margin-bottom: 15px;
+    }
+
+    .wpj-field-row > *:last-child {
+        margin-bottom: 0;
+    }
+}
+
+/* ==========================================================================
+   Tabs (CMB2-tabs style - Improved)
+   ========================================================================== */
+.wpj-tabs-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    margin: -6px -12px -12px -12px;
+    background: #fff;
+    padding: 0 !important;
+}
+
+/* Tabs Navigation - Horizontal */
+.wpj-tabs {
+    display: flex;
+    flex-basis: 100%;
+    max-width: 100%;
+    background: #f6f7f7;
+    border-bottom: 1px solid #c3c4c7;
+    margin: 0;
+    padding: 0;
+}
+
+.wpj-tab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 18px;
+    cursor: pointer;
+    border: none;
+    border-bottom: 3px solid transparent;
+    font-size: 13px;
+    font-weight: 500;
+    color: #50575e;
+    background: transparent;
+    transition: all 0.15s ease;
+    margin-bottom: -1px;
+}
+
+.wpj-tab:hover {
+    color: #135e96;
+    background: rgba(0, 0, 0, 0.02);
+}
+
+.wpj-tab.active {
+    color: #1d2327;
+    background: #fff;
+    border-bottom-color: #2271b1;
+}
+
+.wpj-tab-icon .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: inherit;
+    opacity: 0.7;
+}
+
+.wpj-tab.active .wpj-tab-icon .dashicons {
+    opacity: 1;
+    color: #2271b1;
+}
+
+.wpj-tab-title {
+    font-weight: 500;
+}
+
+/* Tabs Content */
+.wpj-tabs-content {
+    flex: 1;
+    padding: 20px 15px;
+    background: #fff;
+    min-width: 0;
+}
+
+.wpj-tab-content {
+    display: none;
+}
+
+.wpj-tab-content.wpj-tab-content-active {
+    display: block;
+}
+
+/* Vertical Tabs */
+.wpj-tabs-wrap.wpj-tabs-vertical {
+    flex-wrap: nowrap;
+}
+
+.wpj-tabs-wrap.wpj-tabs-vertical .wpj-tabs {
+    flex-direction: column;
+    flex-basis: 150px;
+    min-width: 150px;
+    max-width: 150px;
+    border-bottom: none;
+    border-right: 1px solid #c3c4c7;
+    background: #f6f7f7;
+}
+
+.wpj-tabs-wrap.wpj-tabs-vertical .wpj-tab {
+    border-bottom: none;
+    border-left: 3px solid transparent;
+    margin-bottom: 0;
+    margin-left: -1px;
+    padding: 10px 15px;
+}
+
+.wpj-tabs-wrap.wpj-tabs-vertical .wpj-tab.active {
+    background: #fff;
+    border-left-color: #2271b1;
+    border-bottom: none;
+    margin-right: -1px;
+}
+
+.wpj-tabs-wrap.wpj-tabs-vertical .wpj-tabs-content {
+    flex: 1;
+    border-left: none;
+    padding: 15px 20px;
+}
+
+/* Responsive tabs */
+@media screen and (max-width: 782px) {
+    .wpj-tabs-wrap,
+    .wpj-tabs-wrap.wpj-tabs-vertical {
+        flex-direction: column;
+    }
+
+    .wpj-tabs,
+    .wpj-tabs-wrap.wpj-tabs-vertical .wpj-tabs {
+        flex-direction: row;
+        flex-wrap: wrap;
+        flex-basis: 100%;
+        min-width: 100%;
+        max-width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #c3c4c7;
+    }
+
+    .wpj-tab,
+    .wpj-tabs-wrap.wpj-tabs-vertical .wpj-tab {
+        flex: 1 1 auto;
+        justify-content: center;
+        text-align: center;
+        border-left: none;
+        border-bottom: 3px solid transparent;
+        margin-left: 0;
+        padding: 10px 12px;
+    }
+
+    .wpj-tabs-wrap.wpj-tabs-vertical .wpj-tab.active {
+        border-left: none;
+        border-bottom-color: #2271b1;
+        margin-right: 0;
+    }
+
+    .wpj-tab-icon {
+        display: none;
+    }
+}
+
+/* ==========================================================================
+   Layout Variants
+   ========================================================================== */
+
+/* Stacked Layout (Label above input) */
+.wpj-field--layout-stacked .wpj-field__label {
+    display: block;
+    margin-bottom: 8px;
+}
+
+.wpj-field--layout-stacked .wpj-field__input {
+    width: 100%;
+}
+
+/* Inline Layout (Label beside input) */
+.wpj-field--layout-inline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--wpj-field-gap);
+}
+
+.wpj-field--layout-inline .wpj-field__label {
+    flex: 0 0 var(--wpj-field-label-width);
+}
+
+/* Label Alignment Modifiers */
+.wpj-field--layout-inline .wpj-field__label.top {
+    align-self: flex-start;
+}
+
+.wpj-field--layout-inline .wpj-field__label.center {
+    align-self: center;
+}
+
+.wpj-field--layout-inline .wpj-field__label.bottom {
+    align-self: flex-end;
+}
+
+.wpj-field--layout-inline .wpj-field__input {
+    flex: 1;
+    min-width: 200px;
+}
+
+.wpj-field--layout-inline .wpj-field__description {
+    flex: 0 0 auto;
+    width: calc(100% - var(--wpj-field-label-width) - var(--wpj-field-gap));
+    padding-left: calc(var(--wpj-field-label-width) + var(--wpj-field-gap));
+}
+
+/* ==========================================================================
+   Label
+   ========================================================================== */
+.wpj-field__label {
+    font-size: var(--wpj-field-label-font-size);
+}
+
+.wpj-field__label label {
+    display: inline-block;
+    color: var(--wpj-field-label-color);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.wpj-field__required {
+    color: var(--wpj-field-required-color);
+    margin-left: 2px;
+    font-weight: bold;
+}
+
+.wpj-field__tooltip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    margin-left: 5px;
+    background: var(--wpj-field-description-color);
+    color: #fff;
+    border-radius: 50%;
+    font-size: 11px;
+    cursor: help;
+}
+
+/* ==========================================================================
+   Input Container
+   ========================================================================== */
+.wpj-field__input {
+    position: relative;
+}
+
+.wpj-field__before,
+.wpj-field__after {
+    display: inline-block;
+    padding: 0 8px;
+    color: var(--wpj-field-description-color);
+}
+
+/* ==========================================================================
+   Description
+   ========================================================================== */
+.wpj-field__description {
+    margin: 0;
+    font-size: var(--wpj-field-description-font-size);
+    font-style: italic;
+    color: var(--wpj-field-description-color);
+}
+
+/* ==========================================================================
+   Errors
+   ========================================================================== */
+.wpj-field__errors {
+    margin-top: 6px;
+}
+
+.wpj-field__error {
+    margin: 0 0 4px 0;
+    padding: 6px 10px;
+    background: rgba(214, 54, 56, 0.1);
+    border-left: 3px solid var(--wpj-field-error-color);
+    color: var(--wpj-field-error-color);
+    font-size: var(--wpj-field-description-font-size);
+}
+
+/* Inline validation error (real-time) */
+.wpj-field__inline-error {
+    margin: 6px 0 0 0;
+    padding: 6px 10px;
+    background: rgba(214, 54, 56, 0.08);
+    border-left: 3px solid var(--wpj-field-error-color);
+    color: var(--wpj-field-error-color);
+    font-size: 12px;
+    font-style: normal;
+    border-radius: 0 var(--wpj-field-border-radius) var(--wpj-field-border-radius) 0;
+    animation: wpj-error-fade-in 0.2s ease-out;
+}
+
+@keyframes wpj-error-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.wpj-field--has-errors .wpj-field__input input,
+.wpj-field--has-errors .wpj-field__input select,
+.wpj-field--has-errors .wpj-field__input textarea {
+    border-color: var(--wpj-field-error-color);
+}
+
+/* Error state for icon wrapper fields */
+.wpj-field--has-errors .wpj-field__icon-wrapper input {
+    border-color: var(--wpj-field-error-color);
+}
+
+.wpj-field--has-errors .wpj-field__icon {
+    border-color: var(--wpj-field-error-color);
+    background: rgba(214, 54, 56, 0.05);
+}
+
+/* ==========================================================================
+   Common Input Styles
+   ========================================================================== */
+.wpj-field input[type="text"],
+.wpj-field input[type="email"],
+.wpj-field input[type="url"],
+.wpj-field input[type="number"],
+.wpj-field input[type="password"],
+.wpj-field input[type="date"],
+.wpj-field input[type="time"],
+.wpj-field input[type="datetime-local"],
+.wpj-field select,
+.wpj-field textarea {
+    width: 100%;
+    max-width: 100%;
+    padding: 8px 12px;
+    margin: 0 !important;
+    border: var(--wpj-field-border-width) solid var(--wpj-field-border-color);
+    border-radius: var(--wpj-field-border-radius);
+    background: var(--wpj-field-bg-color);
+    font-size: var(--wpj-field-font-size);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    box-sizing: border-box;
+}
+
+.wpj-field input:focus,
+.wpj-field select:focus,
+.wpj-field textarea:focus {
+    border-color: var(--wpj-field-focus-color);
+    box-shadow: 0 0 0 1px var(--wpj-field-focus-color);
+    outline: 2px solid transparent;
+}
+
+/* ==========================================================================
+   Icon Input (Text fields with icons)
+   ========================================================================== */
+.wpj-field__icon-wrapper {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+}
+
+.wpj-field__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    background: #f6f7f7;
+    border: var(--wpj-field-border-width) solid var(--wpj-field-border-color);
+    color: var(--wpj-field-icon-color);
+    font-size: 16px;
+}
+
+.wpj-field__icon--left {
+    border-right: none;
+    border-radius: var(--wpj-field-border-radius) 0 0 var(--wpj-field-border-radius);
+}
+
+.wpj-field__icon--right {
+    border-left: none;
+    border-radius: 0 var(--wpj-field-border-radius) var(--wpj-field-border-radius) 0;
+}
+
+/* Icon text (for money prefix etc) */
+.wpj-field__icon-text {
+    font-weight: 600;
+    font-size: 14px;
+    color: #50575e;
+}
+
+.wpj-field__icon-wrapper input {
+    flex: 1;
+}
+
+.wpj-field__icon-wrapper .wpj-field__icon--left + input {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.wpj-field__icon-wrapper input:has(+ .wpj-field__icon--right),
+.wpj-field--has-icon-right input {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+/* ==========================================================================
+   Textarea
+   ========================================================================== */
+.wpj-field textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.wpj-field textarea.large-text {
+    min-height: 150px;
+}
+
+/* ==========================================================================
+   Code Editor / Ace Editor
+   ========================================================================== */
+.wpj-ace-editor.ace_editor {
+    border: var(--wpj-field-border-width) solid var(--wpj-field-border-color);
+    border-radius: var(--wpj-field-border-radius);
+}
+
+.wpj-field--code .wpj-field__input,
+.wpj-field--textarea_code .wpj-field__input {
+    width: 100%;
+}
+
+/* Ace Editor wrapper */
+.wpj-field__ace-wrapper {
+    width: 100%;
+}
+
+/* Ace Editor container */
+.wpj-ace-editor {
+    width: 100%;
+    border: var(--wpj-field-border-width) solid var(--wpj-field-border-color);
+    border-radius: var(--wpj-field-border-radius);
+    font-size: 13px;
+}
+
+/* Override Ace's default styles for better WordPress integration */
+.wpj-ace-editor .ace_gutter {
+    background: #f6f7f7;
+    color: #646970;
+}
+
+.wpj-ace-editor .ace_gutter-active-line {
+    background: rgba(34, 113, 177, 0.1);
+}
+
+.wpj-ace-editor .ace_active-line {
+    background: rgba(34, 113, 177, 0.05) !important;
+}
+
+.wpj-ace-editor .ace_selection {
+    background: rgba(34, 113, 177, 0.2) !important;
+}
+
+.wpj-ace-editor .ace_cursor {
+    color: var(--wpj-field-focus-color);
+}
+
+/* Focused state */
+.wpj-ace-editor:focus-within,
+.wpj-ace-editor.ace_focus {
+    border-color: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* Fallback for textarea when Ace not initialized */
+.wpj-field--code textarea.code,
+.wpj-field--textarea_code textarea.code {
+    font-family: Consolas, Monaco, 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    min-height: 250px;
+}
+
+/* ==========================================================================
+   Select (with dropdown arrow)
+   ========================================================================== */
+.wpj-field select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23646970' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+    cursor: pointer;
+}
+
+.wpj-field select::-ms-expand {
+    display: none;
+}
+
+.wpj-field select[multiple] {
+    background-image: none;
+    padding-right: 12px;
+    min-height: 100px;
+}
+
+/* ==========================================================================
+   Select2 Integration
+   ========================================================================== */
+/* Hide the original select when Select2 is active */
+.wpj-field select.wpj-select2 {
+    width: 100%;
+}
+
+/* Select2 Container */
+.wpj-field .select2-container {
+    width: 100% !important;
+}
+
+.wpj-field .select2-container--default .select2-selection--single,
+.wpj-field .select2-container--default .select2-selection--multiple {
+    min-height: 45.6px;
+    border: var(--wpj-field-border-width) solid var(--wpj-field-border-color);
+    border-radius: var(--wpj-field-border-radius);
+    background: var(--wpj-field-bg-color);
+    font-size: var(--wpj-field-font-size);
+}
+
+.wpj-field .select2-container--default .select2-selection--single .select2-selection__rendered {
+    padding: 8px 12px;
+    line-height: 28px;
+    color: var(--wpj-field-label-color);
+}
+
+.wpj-field .select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 45.6px;
+    right: 8px;
+}
+
+.select2-container--default .select2-search--dropdown .select2-search__field {
+    height: 40px !important;
+}
+
+/* Multiple Selection */
+.wpj-field .select2-container--default .select2-selection--multiple {
+    padding: 4px 8px;
+}
+
+.wpj-field .select2-container--default .select2-selection--multiple .select2-selection__choice {
+    background: #f0f0f1;
+    border: 1px solid var(--wpj-field-border-color);
+    border-radius: 3px;
+    padding: 2px 8px;
+    margin: 2px 4px 2px 0;
+    font-size: 13px;
+}
+
+.wpj-field .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+    margin-right: 6px;
+    color: #666;
+}
+
+.wpj-field .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
+    color: var(--wpj-field-error-color);
+}
+
+/* Focus State */
+.wpj-field .select2-container--default.select2-container--focus .select2-selection--single,
+.wpj-field .select2-container--default.select2-container--focus .select2-selection--multiple,
+.wpj-field .select2-container--default.select2-container--open .select2-selection--single,
+.wpj-field .select2-container--default.select2-container--open .select2-selection--multiple {
+    border-color: var(--wpj-field-focus-color);
+    box-shadow: 0 0 0 1px var(--wpj-field-focus-color);
+    outline: none;
+}
+
+/* Dropdown */
+.select2-container--default .select2-dropdown {
+    border: 1px solid var(--wpj-field-border-color);
+    border-radius: var(--wpj-field-border-radius);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.select2-container--default .select2-results__option {
+    padding: 8px 12px;
+}
+
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background: var(--wpj-field-focus-color);
+}
+
+.select2-container--default .select2-results__option[aria-selected=true] {
+    background: #f0f6fc;
+    color: var(--wpj-field-label-color);
+}
+
+/* Search Box in Dropdown */
+.select2-container--default .select2-search--dropdown .select2-search__field {
+    padding: 8px 12px;
+    border: 1px solid var(--wpj-field-border-color);
+    border-radius: var(--wpj-field-border-radius);
+}
+
+.select2-container--default .select2-search--dropdown .select2-search__field:focus {
+    border-color: var(--wpj-field-focus-color);
+    outline: none;
+}
+
+/* Clear Button */
+.wpj-field .select2-container--default .select2-selection__clear {
+    margin-right: 16px;
+    font-size: 16px;
+    color: #666;
+    margin-top: -2px;
+}
+
+.wpj-field .select2-container--default .select2-selection__clear:hover {
+    color: var(--wpj-field-error-color);
+}
+
+/* ==========================================================================
+   Checkbox & Radio - Toggle Switch Style
+   ========================================================================== */
+.wpj-field--checkbox .wpj-field__input,
+.wpj-field--radio .wpj-field__input {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Single Toggle Switch */
+.wpj-field__toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.wpj-field__toggle-switch {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    background: #c3c4c7;
+    border-radius: 12px;
+    transition: background 0.2s ease;
+    flex-shrink: 0;
+}
+
+.wpj-field__toggle-switch::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease;
+}
+
+.wpj-field__toggle input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.wpj-field__toggle input:checked + .wpj-field__toggle-switch {
+    background: var(--wpj-field-toggle-color);
+}
+
+.wpj-field__toggle input:checked + .wpj-field__toggle-switch::after {
+    transform: translateX(20px);
+}
+
+.wpj-field__toggle input:focus + .wpj-field__toggle-switch {
+    box-shadow: 0 0 0 2px rgba(34, 113, 177, 0.3);
+}
+
+.wpj-field__toggle-label {
+    font-weight: 400;
+    color: var(--wpj-field-label-color);
+}
+
+/* Checkbox/Radio Group */
+.wpj-field__options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.wpj-field__options--inline {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.wpj-field__option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.wpj-field__option input[type="checkbox"],
+.wpj-field__option input[type="radio"] {
+    width: 18px !important;
+    height: 18px !important;
+    margin: 0;
+    accent-color: var(--wpj-field-toggle-color);
+    flex-shrink: 0;
+    /* Fix radio/checkbox centering */
+    appearance: none;
+    -webkit-appearance: none;
+    border: 2px solid var(--wpj-field-border-color);
+    background: #fff;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.wpj-field__option input[type="radio"] {
+    border-radius: 50%;
+}
+
+.wpj-field__option input[type="checkbox"] {
+    border-radius: 3px;
+}
+
+.wpj-field__option input[type="radio"]:checked {
+    border-color: var(--wpj-field-toggle-color);
+    background: var(--wpj-field-toggle-color);
+    box-shadow: inset 0 0 0 3px #fff;
+}
+
+.wpj-field__option input[type="checkbox"]:checked {
+    border-color: var(--wpj-field-toggle-color);
+    background: var(--wpj-field-toggle-color);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='white'%3E%3Cpath d='M12.207 4.793a1 1 0 0 1 0 1.414l-5 5a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L6.5 9.086l4.293-4.293a1 1 0 0 1 1.414 0z'/%3E%3C/svg%3E");
+    background-size: 16px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.wpj-field__option input[type="checkbox"]:checked::before {
+    content: "" !important;
+}
+
+.wpj-field__option input[type="radio"]:focus,
+.wpj-field__option input[type="checkbox"]:focus {
+    outline: none;
+    border-color: var(--wpj-field-focus-color);
+}
+
+.wpj-field__option input[type="radio"]:checked:focus {
+    box-shadow: inset 0 0 0 3px #fff, 0 0 0 2px rgba(34, 113, 177, 0.3);
+}
+
+.wpj-field__option input[type="checkbox"]:checked:focus {
+    box-shadow: 0 0 0 2px rgba(34, 113, 177, 0.3);
+}
+
+.wpj-field__option label {
+    font-weight: 400;
+    cursor: pointer;
+    line-height: 1.4;
+}
+
+/* ==========================================================================
+   Color Picker
+   ========================================================================== */
+.wpj-field__input .wp-picker-container .wp-color-result.button {
+    min-height: 30px !important;
+    margin: 0 !important;
+    padding: 0 0 0 30px !important;
+    font-size: 12px !important;
+}
+
+.wpj-field--color_picker .wpj-field__input {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.wpj-field--color_picker input[type="text"] {
+    max-width: 120px;
+}
+
+/* ==========================================================================
+   Media/File Upload - Advanced UI
+   ========================================================================== */
+.wpj-field__upload-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 100%;
+}
+
+.wpj-field__upload-preview {
+    position: relative;
+    display: none;
+    padding: 12px;
+    background: #f6f7f7;
+    border: 1px solid var(--wpj-field-border-color);
+    border-radius: var(--wpj-field-border-radius);
+}
+
+.wpj-field__upload-preview.has-file {
+    display: block;
+}
+
+.wpj-field__upload-preview img {
+    max-width: 200px;
+    max-height: 150px;
+    border-radius: var(--wpj-field-border-radius);
+    display: block;
+    margin-bottom: 10px;
+}
+
+.wpj-field__upload-file-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #fff;
+    border: 1px solid var(--wpj-field-border-color);
+    border-radius: var(--wpj-field-border-radius);
+    font-size: 13px;
+}
+
+.wpj-field__upload-file-icon {
+    font-size: 18px;
+    color: var(--wpj-field-icon-color);
+}
+
+.wpj-field__upload-file-name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.wpj-field__upload-file-path {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    padding: 6px 10px;
+    background: #fff;
+    border: 1px dashed var(--wpj-field-border-color);
+    border-radius: var(--wpj-field-border-radius);
+    font-size: 12px;
+    font-family: monospace;
+    color: var(--wpj-field-description-color);
+}
+
+.wpj-field__upload-file-path input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 0;
+    font-size: 12px;
+    font-family: monospace;
+    color: var(--wpj-field-description-color);
+}
+
+.wpj-field__upload-copy-btn {
+    padding: 4px 8px;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.wpj-field__upload-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.wpj-field__upload-remove {
+    color: var(--wpj-field-error-color);
+}
+
+.wpj-field__upload-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.wpj-field__upload-dropzone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    border: 2px dashed var(--wpj-field-border-color);
+    border-radius: var(--wpj-field-border-radius);
+    background: #fafafa;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.wpj-field__upload-dropzone:hover {
+    border-color: var(--wpj-field-focus-color);
+    background: #f0f6fc;
+}
+
+.wpj-field__upload-dropzone-icon {
+    font-size: 32px;
+    color: var(--wpj-field-icon-color);
+    margin-bottom: 8px;
+    width: 32px;
+    height: 32px;
+}
+
+.wpj-field__upload-dropzone-text {
+    font-size: 14px;
+    color: var(--wpj-field-label-color);
+}
+
+.wpj-field__upload-dropzone-hint {
+    font-size: 12px;
+    color: var(--wpj-field-description-color);
+    margin-top: 4px;
+}
+
+/* ==========================================================================
+   Group / Repeater
+   ========================================================================== */
+.wpj-field--group {
+    padding: 0;
+    background: transparent;
+    border: none;
+}
+
+.wpj-field__group-container {
+    border: 1px solid var(--wpj-field-border-color);
+    border-radius: var(--wpj-field-border-radius);
+    overflow: hidden;
+}
+
+.wpj-field__group-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 15px;
+    background: #f6f7f7;
+    border-bottom: 1px solid var(--wpj-field-border-color);
+}
+
+.wpj-field__group-title {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.wpj-field__group-content {
+    padding: 15px;
+    background: #fff;
+}
+
+.wpj-field__group-content .wpj-field {
+    margin-bottom: 15px;
+}
+
+.wpj-field__group-content .wpj-field:last-child {
+    margin-bottom: 0;
+}
+
+/* Repeater Items - Accordion Style */
+.wpj-field__repeater {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.wpj-field__repeater-item {
+    position: relative;
+    background: #fff;
+    border: 1px solid var(--wpj-field-border-color);
+    border-radius: var(--wpj-field-border-radius);
+    overflow: hidden;
+}
+
+.wpj-field__repeater-item-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 15px;
+    background: #f6f7f7;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s ease;
+}
+
+.wpj-field__repeater-item-header:hover {
+    background: #f0f0f1;
+}
+
+.wpj-field__repeater-item-toggle {
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+    color: var(--wpj-field-icon-color);
+    transition: transform 0.2s ease;
+}
+
+.wpj-field__repeater-item--open .wpj-field__repeater-item-toggle {
+    transform: rotate(180deg);
+}
+
+.wpj-field__repeater-item-title {
+    flex: 1;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--wpj-field-label-color);
+}
+
+.wpj-field__repeater-item-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.wpj-field__repeater-item-actions .wpj-field__repeater-remove {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    font-size: 12px;
+}
+
+.wpj-field__repeater-item-actions .wpj-field__repeater-remove .dashicons {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+}
+
+/* Accordion Content */
+.wpj-field__repeater-item-content {
+    display: none;
+    padding: 15px;
+    border-top: 1px solid #f0f0f1;
+}
+
+.wpj-field__repeater-item--open .wpj-field__repeater-item-content {
+    display: block;
+}
+
+.wpj-field__repeater-item-content .wpj-field {
+    margin-bottom: 15px;
+}
+
+.wpj-field__repeater-item-content .wpj-field:last-child {
+    margin-bottom: 0;
+}
+
+.wpj-field__repeater-add,
+.wpj-field__file-list-add,
+.wpj-oembed-fetch {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px !important;
+    justify-content: center;
+    font-size: 13px !important;
+    font-weight: 500;
+    border: 1px dashed var(--wpj-field-border-color);
+    border-radius: var(--wpj-field-border-radius) !important;
+    background: #fafafa !important;
+    color: var(--wpj-field-label-color) !important;
+    cursor: pointer !important;
+    transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.wpj-field__repeater-add:hover {
+    border-color: var(--wpj-field-focus-color);
+    background: #f0f6fc;
+    color: var(--wpj-field-focus-color);
+}
+
+.wpj-field__repeater-add .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+
+.wpj-field__repeater-empty {
+    padding: 24px;
+    text-align: center;
+    color: var(--wpj-field-description-color);
+    background: #fafafa;
+    border: 2px dashed var(--wpj-field-border-color);
+    border-radius: var(--wpj-field-border-radius);
+    margin-bottom: 12px;
+}
+
+/* ==========================================================================
+   Disabled State
+   ========================================================================== */
+.wpj-field--disabled input,
+.wpj-field--disabled select,
+.wpj-field--disabled textarea {
+    background: var(--wpj-field-disabled-bg);
+    cursor: not-allowed;
+}
+
+/* ==========================================================================
+   Context Variations
+   ========================================================================== */
+
+/* Widget context - more compact */
+.wpj-field--context-widget {
+    margin-bottom: 12px;
+}
+
+.wpj-field--context-widget .wpj-field__label label {
+    font-size: 13px;
+}
+
+/* Metabox context */
+.wpj-field--context-metabox {
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f1;
+}
+
+.wpj-field--context-metabox:last-child {
+    border-bottom: none;
+}
+
+/* Settings context */
+.wpj-field--context-settings {
+    padding: 15px 0;
+}
+
+/* ==========================================================================
+   Size Variants
+   ========================================================================== */
+
+/* Small size - 300px (for codes, short text) */
+.wpj-field--size-small .wpj-field__input input[type="text"],
+.wpj-field--size-small .wpj-field__input input[type="email"],
+.wpj-field--size-small .wpj-field__input input[type="url"],
+.wpj-field--size-small .wpj-field__input input[type="number"],
+.wpj-field--size-small .wpj-field__input input[type="date"],
+.wpj-field--size-small .wpj-field__input input[type="time"],
+.wpj-field--size-small .wpj-field__input select,
+.wpj-field--size-small .wpj-field__input textarea,
+.wpj-field--size-small .wpj-field__icon-wrapper {
+    max-width: 300px;
+}
+
+/* Medium size - 50% (half width) */
+.wpj-field--size-medium .wpj-field__input input[type="text"],
+.wpj-field--size-medium .wpj-field__input input[type="email"],
+.wpj-field--size-medium .wpj-field__input input[type="url"],
+.wpj-field--size-medium .wpj-field__input input[type="number"],
+.wpj-field--size-medium .wpj-field__input input[type="date"],
+.wpj-field--size-medium .wpj-field__input input[type="time"],
+.wpj-field--size-medium .wpj-field__input select,
+.wpj-field--size-medium .wpj-field__input textarea,
+.wpj-field--size-medium .wpj-field__icon-wrapper {
+    max-width: 50%;
+}
+
+/* Large size - full width */
+.wpj-field--size-large .wpj-field__input input[type="text"],
+.wpj-field--size-large .wpj-field__input input[type="email"],
+.wpj-field--size-large .wpj-field__input input[type="url"],
+.wpj-field--size-large .wpj-field__input input[type="number"],
+.wpj-field--size-large .wpj-field__input input[type="date"],
+.wpj-field--size-large .wpj-field__input input[type="time"],
+.wpj-field--size-large .wpj-field__input select,
+.wpj-field--size-large .wpj-field__input textarea,
+.wpj-field--size-large .wpj-field__icon-wrapper {
+    max-width: 100%;
+    width: 100%;
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+@media screen and (max-width: 782px) {
+    .wpj-field--layout-inline {
+        flex-direction: column;
+    }
+
+    .wpj-field--layout-inline .wpj-field__label {
+        flex: 0 0 auto;
+        padding-top: 0;
+    }
+
+    .wpj-field--layout-inline .wpj-field__description {
+        padding-left: 0;
+    }
+
+    .wpj-field--size-small .wpj-field__input input,
+    .wpj-field--size-small .wpj-field__input select,
+    .wpj-field--size-medium .wpj-field__input input,
+    .wpj-field--size-medium .wpj-field__input select {
+        max-width: 100%;
+    }
+}
+
+/* ==========================================================================
+   Money / Currency Field
+   ========================================================================== */
+.wpj-field__money-wrapper {
+    display: flex;
+    align-items: center;
+    max-width: 200px;
+}
+
+.wpj-field__money-prefix {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 12px;
+    height: 38px;
+    background: #f6f7f7;
+    border: 1px solid var(--wpj-field-border-color);
+    border-right: none;
+    border-radius: var(--wpj-field-border-radius) 0 0 var(--wpj-field-border-radius);
+    font-weight: 500;
+    color: var(--wpj-field-label-color);
+}
+
+.wpj-field__money-wrapper input {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+/* ==========================================================================
+   File List / Gallery
+   ========================================================================== */
+.wpj-field__file-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.wpj-field__file-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 12px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.wpj-field__file-list-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    background: #f6f7f7;
+    border: 1px solid var(--wpj-field-border-color);
+    border-radius: var(--wpj-field-border-radius);
+    text-align: center;
+}
+
+.wpj-field__file-list-image {
+    max-width: 80px;
+    max-height: 80px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+.wpj-field__file-list-icon {
+    font-size: 40px;
+    color: var(--wpj-field-icon-color);
+    margin-bottom: 8px;
+}
+
+.wpj-field__file-list-name {
+    font-size: 11px;
+    color: var(--wpj-field-description-color);
+    word-break: break-all;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.wpj-field__file-list-remove {
+    margin-top: 8px;
+    font-size: 11px !important;
+    padding: 2px 6px !important;
+}
+
+.wpj-field__file-list-add {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    align-self: flex-start;
+}
+
+/* ==========================================================================
+   No Terms Message
+   ========================================================================== */
+.wpj-field__no-terms {
+    color: var(--wpj-field-description-color);
+    font-style: italic;
+}
+
+/* ==========================================================================
+   Conditional Logic - Hidden Field State
+   ========================================================================== */
+.wpj-field.field_is_hidden {
+    display: none !important;
+}
+
+/* ==========================================================================
+   Location Map Field
+   ========================================================================== */
+.wpj-field__location-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.wpj-field__location-map {
+    width: 100%;
+    min-height: 300px;
+    border: 1px solid var(--wpj-field-border-color);
+    border-radius: var(--wpj-field-border-radius);
+    overflow: hidden;
+    background: #f6f7f7;
+}
+
+/* Leaflet CSS fixes for WordPress admin compatibility */
+.wpj-leaflet-map {
+    z-index: 0;
+}
+
+.wpj-leaflet-map .leaflet-tile-pane {
+    z-index: 200 !important;
+}
+
+.wpj-leaflet-map .leaflet-tile {
+    max-width: none !important;
+    max-height: none !important;
+}
+
+.wpj-leaflet-map .leaflet-tile-container img,
+.wpj-leaflet-map img.leaflet-tile {
+    max-width: none !important;
+    max-height: none !important;
+    width: 256px !important;
+    height: 256px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.wpj-leaflet-map .leaflet-pane {
+    z-index: 400;
+}
+
+.wpj-leaflet-map .leaflet-control-container {
+    z-index: 800;
+}
+
+.wpj-field__location-map iframe {
+    display: block;
+    width: 100%;
+    min-height: 200px;
+    border: none;
+}
+
+.wpj-field__location-map-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 200px;
+    color: var(--wpj-field-description-color);
+}
+
+.wpj-field__location-map-placeholder .dashicons {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    opacity: 0.4;
+}
+
+.wpj-field__location-coords {
+    display: flex;
+    gap: 10px;
+}
+
+.wpj-field__location-coords input {
+    width: 150px;
+}
+
+/* Address row with search input and location button */
+.wpj-field__location-address-row {
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
+}
+
+.wpj-field__location-address-row .wpj-field__icon-wrapper {
+    flex: 1;
+}
+
+/* Current location button */
+.wpj-location-current {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    min-width: 42px;
+    padding: 0;
+    border-radius: var(--wpj-field-border-radius);
+}
+
+.wpj-location-current .dashicons {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+    line-height: 32px;
+}
+
+/* Spinner animation for loading state */
+.wpj-location-current .dashicons.spin {
+    animation: wpj-spin 1s linear infinite;
+}
+
+@keyframes wpj-spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Google Map styling */
+.wpj-google-map {
+    width: 100%;
+    max-width: 100%;
+    border: 1px solid var(--wpj-field-border-color);
+    border-radius: var(--wpj-field-border-radius);
+    overflow: hidden;
+}
+
+/* Google Places autocomplete dropdown */
+.pac-container {
+    z-index: 100000 !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    font-size: 14px;
+    border-radius: var(--wpj-field-border-radius);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.pac-item {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.pac-item:hover {
+    background: #f0f6fc;
+}
+
+.pac-item-query {
+    font-weight: 500;
+}
+
+
+.leaflet-control-attribution.leaflet-control {
+    display: none !important;
+}
+
+/* ==========================================================================
+   oEmbed Field
+   ========================================================================== */
+.wpj-field__oembed-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.wpj-field__oembed-input-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.wpj-field__oembed-input-row .wpj-oembed-input {
+    flex: 1;
+}
+
+.wpj-field__oembed-input-row .button {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+}
+
+.wpj-field__oembed-preview {
+    padding: 16px;
+    background: #f6f7f7;
+    border: 1px solid var(--wpj-field-border-color);
+    border-radius: var(--wpj-field-border-radius);
+    min-height: 60px;
+}
+
+.wpj-field__oembed-preview:empty::before {
+    content: "Enter a URL and click Preview to see the embed.";
+    color: #757575;
+    font-style: italic;
+}
+
+.wpj-field__oembed-preview iframe,
+.wpj-field__oembed-preview video,
+.wpj-field__oembed-preview embed {
+    max-width: 100%;
+    width: 100%;
+    border-radius: 4px;
+}
+
+.wpj-field__oembed-preview .twitter-tweet {
+    margin: 0 !important;
+}
+
+/* Timezone preview */
+.wpj-timezone-preview {
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: #e8f4fc;
+    border-radius: var(--wpj-field-border-radius);
+    color: #1d2327;
+    font-size: 13px;
+}
+
+/* Country select with flags */
+.wpj-country-select + .select2-container .select2-selection__rendered {
+    font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+}
+
+/*
+Styling for widget
+*/
+.wp-jarvis-widget-container {
+    margin: 1em 0
+}
+
+.wp-jarvis-widget-field {
+    margin-bottom: 10px;
+}
+
+.widget-content .wpj-field input[type="text"],
+.widget-content .wpj-field input[type="email"],
+.widget-content .wpj-field input[type="url"],
+.widget-content .wpj-field input[type="number"],
+.widget-content .wpj-field input[type="password"],
+.widget-content .wpj-field input[type="date"],
+.widget-content .wpj-field input[type="time"],
+.widget-content .wpj-field input[type="datetime-local"],
+.widget-content .wpj-field select,
+.widget-content .wpj-field textarea {
+    padding: 4px 12px;
+}
+
+.widget-content .wpj-field__toggle-switch {
+    width: 40px;
+    height: 20px;
+}
+
+.widget-content .wpj-field__toggle-switch::after {
+    width: 15px;
+    height: 15px;
+}

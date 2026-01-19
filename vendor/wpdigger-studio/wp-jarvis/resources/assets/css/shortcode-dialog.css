@@ -1,0 +1,239 @@
+/**
+ * WP-Jarvis Shortcode Dialog Styles
+ *
+ * Styling for shortcode configuration modals with Field System integration.
+ */
+
+/* ================================
+   Modal Overlay & Container
+   ================================ */
+
+.wpj-shortcode-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 100100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.wpj-shortcode-modal {
+    background: #fff;
+    border-radius: 4px;
+    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
+    max-width: 800px;
+    width: 100%;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ================================
+   Modal Header
+   ================================ */
+
+.wpj-shortcode-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 20px;
+    border-bottom: 1px solid #ddd;
+    background: #f7f7f7;
+}
+
+.wpj-shortcode-modal-header h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #23282d;
+}
+
+.wpj-shortcode-modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+    padding: 0;
+    line-height: 1;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
+    transition: background 0.15s ease;
+}
+
+.wpj-shortcode-modal-close:hover {
+    background: #e0e0e0;
+    color: #333;
+}
+
+/* ================================
+   Modal Body
+   ================================ */
+
+.wpj-shortcode-modal-body {
+    padding: 20px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.wpj-shortcode-loading {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+}
+
+.wpj-error {
+    color: #d63638;
+    padding: 15px;
+    background: #fcf0f0;
+    border-left: 4px solid #d63638;
+    margin: 0;
+}
+
+/* ================================
+   Shortcode Dialog Content
+   ================================ */
+
+.wpj-shortcode-description {
+    color: #666;
+    font-style: italic;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.wpj-shortcode-fields {
+    margin-bottom: 20px;
+}
+
+.wpj-shortcode-content-field {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.wpj-shortcode-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    margin-top: 20px;
+}
+
+/* ================================
+   Field System Overrides
+   ================================ */
+
+.wpj-shortcode-dialog .wpj-field-wrapper {
+    margin-bottom: 15px;
+}
+
+.wpj-shortcode-dialog .wpj-field-label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #23282d;
+}
+
+.wpj-shortcode-dialog .wpj-field-description {
+    font-size: 12px;
+    color: #666;
+    margin-top: 4px;
+}
+
+.wpj-shortcode-dialog input[type="text"],
+.wpj-shortcode-dialog input[type="number"],
+.wpj-shortcode-dialog input[type="email"],
+.wpj-shortcode-dialog input[type="url"],
+.wpj-shortcode-dialog textarea,
+.wpj-shortcode-dialog select {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.wpj-shortcode-dialog input[type="text"]:focus,
+.wpj-shortcode-dialog input[type="number"]:focus,
+.wpj-shortcode-dialog input[type="email"]:focus,
+.wpj-shortcode-dialog input[type="url"]:focus,
+.wpj-shortcode-dialog textarea:focus,
+.wpj-shortcode-dialog select:focus {
+    border-color: #2271b1;
+    box-shadow: 0 0 0 1px #2271b1;
+    outline: none;
+}
+
+.wpj-shortcode-dialog textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+.wpj-shortcode-dialog .wpj-field-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.wpj-shortcode-dialog .wpj-field-checkbox input[type="checkbox"] {
+    width: auto;
+}
+
+/* ================================
+   TinyMCE Dialog Fallback Styles
+   ================================ */
+
+.mce-wpjarvis-shortcode-dialog .mce-panel {
+    background: #fff;
+}
+
+.mce-wpjarvis-shortcode-dialog .mce-textbox {
+    border-radius: 3px;
+}
+
+.mce-wpjarvis-shortcode-dialog .mce-textbox:focus {
+    border-color: #0073aa;
+    box-shadow: 0 0 0 1px #0073aa;
+}
+
+.mce-wpjarvis-shortcode-dialog .mce-textbox.mce-multiline {
+    min-height: 80px;
+}
+
+/* ================================
+   Responsive
+   ================================ */
+
+@media (max-width: 600px) {
+    .wpj-shortcode-modal {
+        max-width: 100%;
+        margin: 10px;
+    }
+
+    .wpj-shortcode-modal-body {
+        padding: 15px;
+    }
+
+    .wpj-shortcode-actions {
+        flex-direction: column;
+    }
+
+    .wpj-shortcode-actions .button {
+        width: 100%;
+        text-align: center;
+    }
+}

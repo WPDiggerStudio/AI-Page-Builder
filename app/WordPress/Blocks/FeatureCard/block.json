@@ -1,0 +1,40 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "wpjarvis/feature-card",
+    "version": "1.0.0",
+    "title": "Feature Card",
+    "category": "design",
+    "icon": "star-filled",
+    "description": "A custom Feature Card block.",
+    "keywords": [
+        "feature-card",
+        "custom",
+        "wpjarvis"
+    ],
+    "supports": {
+        "html": false,
+        "align": [
+            "wide",
+            "full"
+        ],
+        "anchor": true
+    },
+    "textdomain": "bra-calculator",
+    "attributes": {
+        "heading": {
+            "type": "string",
+            "default": "Feature Title"
+        },
+        "description": {
+            "type": "string",
+            "default": "Feature description goes here"
+        },
+        "showIcon": {
+            "type": "boolean",
+            "default": true
+        }
+    },
+    "render": "file:./render.php",
+    "editorScript": "file:./index.js"
+}

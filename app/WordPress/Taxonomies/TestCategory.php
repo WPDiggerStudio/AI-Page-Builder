@@ -1,0 +1,276 @@
+<?php
+
+declare( strict_types=1 );
+
+namespace BraCalculator\App\WordPress\Taxonomies;
+
+use WPJarvis\Framework\Support\Facades\Hooks;
+use WPJarvis\Framework\WP\Content\Taxonomy as TaxonomyBuilder;
+
+/**
+ * TestCategory Taxonomy
+ *
+ * Registers and manages Test Category taxonomy.
+ *
+ * @package BraCalculator\App\WordPress\Taxonomies
+ */
+class TestCategory {
+	/**
+	 * The taxonomy slug.
+	 */
+	public const SLUG = 'test_category';
+
+	/**
+	 * The singular label.
+	 */
+	public const SINGULAR = 'Test Category';
+
+	/**
+	 * The plural label.
+	 */
+	public const PLURAL = 'Test Categories';
+
+	/**
+	 * Associated post-types.
+	 */
+	public const POST_TYPES = [ 'post', 'test_article' ];
+
+	/**
+	 * Register taxonomy.
+	 *
+	 * @return void
+	 */
+	public function register(): void {
+		Hooks::action( 'init', [ $this, 'registerTaxonomy' ] );
+	}
+
+	/**
+	 * Register taxonomy with WordPress.
+	 *
+	 * @return void
+	 */
+	public function registerTaxonomy(): void {
+		TaxonomyBuilder::make( self::SLUG )
+		               ->labels( self::SINGULAR, self::PLURAL )
+		               ->forPostTypes( ...self::POST_TYPES )
+		               ->hierarchical( false )
+		               ->showInRest()
+		               ->showAdminColumn()
+		               ->rewrite( [ 'slug' => self::SLUG, 'with_front' => false ] )
+		               ->register();
+	}
+
+	/**
+	 * Get taxonomy slug.
+	 *
+	 * @return string Taxonomy slug.
+	 */
+	public static function slug(): string {
+		return self::SLUG;
+	}
+
+	/**
+	 * Get all terms.
+	 *
+	 * @param array<string, mixed> $args Query arguments.
+	 *
+	 * @return array<\WP_Term>|\WP_Error Array of terms or WP_Error on failure.
+	 */
+	public static function all( array $args = [] ): array|\WP_Error {
+		return get_terms( array_merge( [
+			'taxonomy'   => self::SLUG,
+			'hide_empty' => false,
+		], $args ) );
+	}
+
+	/**
+	 * Get a term by ID.
+	 *
+	 * @param int $id Term ID.
+	 *
+	 * @return \WP_Term|null Term object or null if not found.
+	 */
+	public static function find( int $id ): ?\WP_Term {
+		$term = get_term( $id, self::SLUG );
+
+		return $term instanceof \WP_Term ? $term : null;
+	}
+
+	/**
+	 * Get a term by slug.
+	 *
+	 * @param string $slug Term slug.
+	 *
+	 * @return \WP_Term|null Term object or null if not found.
+	 */
+	public static function findBySlug( string $slug ): ?\WP_Term {
+		$term = get_term_by( 'slug', $slug, self::SLUG );
+
+		return $term instanceof \WP_Term ? $term : null;
+	}
+
+	/**
+	 * Get a term by name.
+	 *
+	 * @param string $name Term name.
+	 *
+	 * @return \WP_Term|null Term object or null if not found.
+	 */
+	public static function findByName( string $name ): ?\WP_Term {
+		$term = get_term_by( 'name', $name, self::SLUG );
+
+		return $term instanceof \WP_Term ? $term : null;
+	}
+
+	/**
+	 * Get terms for a post.
+	 *
+	 * @param int $postId Post ID.
+	 *
+	 * @return array<\WP_Term> Array of terms.
+	 */
+	public static function forPost( int $postId ): array {
+		$terms = get_the_terms( $postId, self::SLUG );
+
+		return is_array( $terms ) ? $terms : [];
+	}
+
+	/**
+	 * Check if a post has a specific term.
+	 *
+	 * @param int $postId Post ID.
+	 * @param int|string $term Term ID, slug, or name.
+	 *
+	 * @return bool True if the post has the term.
+	 */
+	public static function postHasTerm( int $postId, int|string $term ): bool {
+		return has_term( $term, self::SLUG, $postId );
+	}
+
+	/**
+	 * Get term link.
+	 *
+	 * @param int|\WP_Term $term Term ID or object.
+	 *
+	 * @return string|\WP_Error Term link or WP_Error on failure.
+	 */
+	public static function getLink( int|\WP_Term $term ): string|\WP_Error {
+		return get_term_link( $term, self::SLUG );
+	}
+
+	/**
+	 * Get term count.
+	 *
+	 * @param bool $hideEmpty Whether to hide empty terms.
+	 *
+	 * @return int Number of terms.
+	 */
+	public static function count( bool $hideEmpty = false ): int {
+		$terms = get_terms( [
+			'taxonomy'   => self::SLUG,
+			'hide_empty' => $hideEmpty,
+			'fields'     => 'count',
+		] );
+
+		return is_numeric( $terms ) ? (int) $terms : 0;
+	}
+
+	/**
+	 * Create a new term.
+	 *
+	 * @param string $name Term name.
+	 * @param string $slug Term slug (optional).
+	 * @param int $parent Parent term ID (optional).
+	 *
+	 * @return array{term_id: int, term_taxonomy_id: int}|\WP_Error Array with term IDs or WP_Error on failure.
+	 */
+	public static function create( string $name, string $slug = '', int $parent = 0 ): array|\WP_Error {
+		return wp_insert_term( $name, self::SLUG, [
+			'slug'   => $slug ?: sanitize_title( $name ),
+			'parent' => $parent,
+		] );
+	}
+
+	/**
+	 * Update an existing term.
+	 *
+	 * @param int $termId Term ID.
+	 * @param array<string, mixed> $args Term data to update.
+	 *
+	 * @return array|\WP_Error Updated term data or WP_Error on failure.
+	 */
+	public static function update( int $termId, array $args ): array|\WP_Error {
+		return wp_update_term( $termId, self::SLUG, $args );
+	}
+
+	/**
+	 * Delete a term.
+	 *
+	 * @param int $termId Term ID.
+	 * @param array<string, mixed> $args Arguments for deletion.
+	 *
+	 * @return bool|\WP_Error True on success, WP_Error on failure.
+	 */
+	public static function delete( int $termId, array $args = [] ): bool|\WP_Error {
+		$defaults = [
+			'force_default' => false,
+		];
+
+		$args = wp_parse_args( $args, $defaults );
+
+		return wp_delete_term( $termId, self::SLUG, $args );
+	}
+
+	/**
+	 * Get term meta value.
+	 *
+	 * @param int $termId Term ID.
+	 * @param string $key Meta key.
+	 * @param mixed $default Default value.
+	 *
+	 * @return mixed Meta value or default.
+	 */
+	public static function getMeta( int $termId, string $key, mixed $default = null ): mixed {
+		$value = get_term_meta( $termId, $key, true );
+
+		return $value !== '' ? $value : $default;
+	}
+
+	/**
+	 * Set term meta value.
+	 *
+	 * @param int $termId Term ID.
+	 * @param string $key Meta key.
+	 * @param mixed $value Meta value.
+	 *
+	 * @return int|bool Meta-ID on success, false on failure.
+	 */
+	public static function setMeta( int $termId, string $key, mixed $value ): int|bool {
+		return update_term_meta( $termId, $key, $value );
+	}
+
+	/**
+	 * Delete term meta value.
+	 *
+	 * @param int $termId Term ID.
+	 * @param string $key Meta key.
+	 *
+	 * @return bool True on success, false on failure.
+	 */
+	public static function deleteMeta( int $termId, string $key ): bool {
+		return delete_term_meta( $termId, $key );
+	}
+
+	/**
+	 * Set terms for a post.
+	 *
+	 * @param int $postId Post ID.
+	 * @param array<int|string> $terms Term IDs, slugs, or names.
+	 * @param bool $append Whether to append to existing terms.
+	 *
+	 * @return array|\WP_Error Array of term IDs or WP_Error on failure.
+	 */
+	public static function setForPost( int $postId, array $terms, bool $append = false ): array|\WP_Error {
+		return wp_set_object_terms( $postId, $terms, self::SLUG, $append );
+	}
+}

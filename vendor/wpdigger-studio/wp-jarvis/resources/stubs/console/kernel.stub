@@ -1,0 +1,107 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ namespace }};
+
+use WPJarvis\Framework\WP\Scheduling\Scheduler;
+use WPJarvis\Framework\Support\Facades\Hooks;
+
+/**
+ * Console Kernel
+ *
+ * Define your scheduled tasks here, just like Laravel's Console Kernel.
+ * The schedule() method is called when the scheduler boots.
+ *
+ * @package {{ namespace }}
+ */
+class Kernel
+{
+    /**
+     * Define the application's command schedule.
+     *
+     * This method is called by the framework's ScheduleServiceProvider.
+     * Use the $schedule variable to define your recurring tasks.
+     *
+     * @param Scheduler $schedule
+     *
+     * @return void
+     */
+    public function schedule(Scheduler $schedule): void
+    {
+        // ===================================================================
+        // SCHEDULING CALLBACKS
+        // ===================================================================
+        // Schedule a simple callback to run daily
+        // $schedule->call(function () {
+        //     // Your code here...
+        // })->daily()->name('daily-cleanup');
+
+        // ===================================================================
+        // SCHEDULING ARTISAN COMMANDS
+        // ===================================================================
+        // Schedule a WP Jarvis command to run hourly
+        // $schedule->command('cache:clear')->hourly();
+
+        // ===================================================================
+        // SCHEDULING JOBS
+        // ===================================================================
+        // Schedule a job class to run every five minutes
+        // $schedule->job(new ProcessPayments)->everyFiveMinutes();
+
+        // Schedule a job on a specific queue
+        // $schedule->job(new SendEmails, 'emails')->daily();
+
+        // ===================================================================
+        // SCHEDULING TASK CLASSES
+        // ===================================================================
+        // Add a custom task class (generated via make:task)
+        // $schedule->add(new \{{ namespace }}\Tasks\CleanupTask());
+
+        // ===================================================================
+        // COMMON SCHEDULE FREQUENCIES
+        // ===================================================================
+        // ->everyMinute();           Every minute
+        // ->everyFiveMinutes();      Every 5 minutes
+        // ->everyTenMinutes();       Every 10 minutes
+        // ->everyFifteenMinutes();   Every 15 minutes
+        // ->everyThirtyMinutes();    Every 30 minutes
+        // ->hourly();                Every hour
+        // ->hourlyAt(15);            Every hour at :15
+        // ->daily();                 Daily at midnight
+        // ->dailyAt('13:00');        Daily at 1 PM
+        // ->twiceDaily(1, 13);       Twice daily at 1 AM and 1 PM
+        // ->weekly();                Weekly on Sunday at midnight
+        // ->weeklyOn(1, '8:00');     Weekly on Monday at 8 AM
+        // ->monthly();               Monthly on the 1st at midnight
+        // ->monthlyOn(15, '9:00');   Monthly on the 15th at 9 AM
+        // ->yearly();                Yearly on January 1st
+
+        // ===================================================================
+        // SCHEDULE MODIFIERS
+        // ===================================================================
+        // ->weekdays();                        Only on weekdays (Mon-Fri)
+        // ->weekends();                        Only on weekends (Sat-Sun)
+        // ->withoutOverlappingUsing(600);      Prevent overlapping (mutex expires in 600s)
+        // ->runInBackground();                 Run in background
+        // ->environments('production');        Only in production
+        // ->production();                      Shorthand for production only
+        // ->before(function () { ... });       Run before task
+        // ->after(function () { ... });        Run after task
+    }
+
+    /**
+     * Register the kernel with the scheduler.
+     *
+     * This method is called automatically by the ScheduleServiceProvider.
+     *
+     * @return void
+     */
+    public static function register(): void
+    {
+        Hooks::action('define_schedule', static function (Scheduler $schedule) {
+            $kernel = new static();
+            $kernel->schedule($schedule);
+        });
+    }
+}

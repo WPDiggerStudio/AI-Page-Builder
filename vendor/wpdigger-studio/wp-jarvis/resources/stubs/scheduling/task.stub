@@ -1,0 +1,165 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ namespace }};
+
+use WPJarvis\Framework\WP\Scheduling\Task;
+
+/**
+ * {{ class }}
+ *
+ * A scheduled task that runs {{ schedule_method }}.
+ *
+ * @package {{ namespace }}
+ */
+class {{ class }} extends Task
+{
+    /**
+     * The task name.
+     */
+    protected string $name = '{{ task_name }}';
+
+    /**
+     * The task description.
+     */
+    protected string $description = '{{ task_description }}';
+
+    /**
+     * Create a new task instance.
+     */
+    public function __construct()
+    {
+        // Set the schedule
+        $this->{{ schedule_method }}();
+
+        // Prevent overlapping (optional)
+        // $this->withoutOverlappingUsing(600);
+
+        // Run in background (optional)
+        // $this->runInBackground();
+
+        // Only run in specific environments (optional)
+        // $this->environments('production');
+    }
+
+    /**
+     * Execute the scheduled task.
+     *
+     * This is where you put your task logic.
+     *
+     * @return mixed
+     */
+    public function handle(): mixed
+    {
+        // Log task start
+        $this->log('Starting {{ class }}...');
+
+        try {
+            // Your task logic here
+            $result = $this->execute();
+
+            // Log success
+            $this->log('{{ class }} completed successfully.');
+
+            return $result;
+        } catch (\Throwable $e) {
+            // Log error
+            $this->log('{{ class }} failed: ' . $e->getMessage(), 'error');
+            throw $e;
+        }
+    }
+
+    /**
+     * Execute the main task logic.
+     *
+     * @return mixed
+     */
+    protected function execute(): mixed
+    {
+        // Example: Clean up old transients
+        // $this->cleanupTransients();
+
+        // Example: Sync external data
+        // $this->syncData();
+
+        // Example: Send scheduled notifications
+        // $this->sendNotifications();
+
+        return true;
+    }
+
+    /**
+     * Log a message.
+     *
+     * @param string $message Message to log.
+     * @param string $level Log level (info, error, warning).
+     */
+    protected function log(string $message, string $level = 'info'): void
+    {
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log(sprintf('[%s] [%s] %s', strtoupper($level), $this->name, $message));
+        }
+
+        do_action('wpjarvis_task_log', $this->name, $message, $level);
+    }
+
+    /**
+     * Example: Cleanup old transients.
+     */
+    protected function cleanupTransients(): int
+    {
+        global $wpdb;
+
+        $expired = $wpdb->query(
+            "DELETE FROM {$wpdb->options}
+             WHERE option_name LIKE '_transient_timeout_%'
+             AND option_value < UNIX_TIMESTAMP()"
+        );
+
+        $this->log("Cleaned up {$expired} expired transients.");
+
+        return $expired;
+    }
+
+    /**
+     * Example: Sync data from external API.
+     */
+    protected function syncData(): void
+    {
+        // $response = wp_remote_get('https://api.example.com/data');
+        // if (!is_wp_error($response)) {
+        //     $data = json_decode(wp_remote_retrieve_body($response), true);
+        //     // Process data...
+        // }
+    }
+
+    /**
+     * Example: Send scheduled notifications.
+     */
+    protected function sendNotifications(): void
+    {
+        // $users = get_users(['meta_key' => 'pending_notification', 'meta_value' => '1']);
+        // foreach ($users as $user) {
+        //     // Send notification...
+        //     delete_user_meta($user->ID, 'pending_notification');
+        // }
+    }
+
+    /**
+     * Handle task failure.
+     *
+     * @param \Throwable $e The exception that caused the failure.
+     */
+    public function handleFailure(\Throwable $e): void
+    {
+        parent::handleFailure($e);
+
+        // Send admin notification on failure
+        // wp_mail(
+        //     get_option('admin_email'),
+        //     __('Scheduled Task Failed', '{{ textdomain }}'),
+        //     sprintf('Task "%s" failed with error: %s', $this->name, $e->getMessage())
+        // );
+    }
+}

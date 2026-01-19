@@ -1,0 +1,19 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "{{ block_namespace }}/{{ block_slug }}",
+    "version": "1.0.0",
+    "title": "{{ block_title }}",
+    "category": "{{ block_category }}",
+    "icon": "{{ block_icon }}",
+    "description": "{{ block_description }}",
+    "keywords": {{ block_keywords_json }},
+    "supports": {
+        "html": false,
+        "align": ["wide", "full"],
+        "anchor": true
+    },
+    "textdomain": "{{ textdomain }}",
+    "attributes": {},
+    "render": "file:./render.php"
+}

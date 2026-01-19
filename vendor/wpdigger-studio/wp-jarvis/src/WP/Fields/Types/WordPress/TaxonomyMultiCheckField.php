@@ -1,0 +1,108 @@
+<?php
+
+declare( strict_types=1 );
+
+namespace WPJarvis\Framework\WP\Fields\Types\WordPress;
+
+use Illuminate\Support\Arr;
+use WPJarvis\Framework\WP\Fields\AbstractField;
+
+/**
+ * TaxonomyMultiCheckField - Taxonomy terms as checkboxes.
+ *
+ * @package WPJarvis\Framework\WP\Fields\Types\WordPress
+ */
+class TaxonomyMultiCheckField extends AbstractField {
+	/**
+	 * Get the field type identifier.
+	 *
+	 * @return string The field type.
+	 */
+	public function getType(): string {
+		return 'taxonomy_multicheck';
+	}
+
+	/**
+	 * Render the input element.
+	 *
+	 * @param array<string, mixed> $config Field configuration.
+	 * @param mixed $value Current field value.
+	 * @param string $context Rendering context.
+	 *
+	 * @return string The input HTML.
+	 */
+	protected function renderInput( array $config, mixed $value, string $context ): string {
+		$taxonomy = $config['taxonomy'] ?? 'category';
+		$id       = $config['id'] ?? '';
+		$name     = $config['name'] ?? $id;
+		$inline   = ! empty( $config['inline'] );
+		$values   = Arr::wrap( $value );
+
+		$terms = get_terms( [
+			'taxonomy'   => $taxonomy,
+			'hide_empty' => $config['hide_empty'] ?? false,
+			'orderby'    => $config['orderby'] ?? 'name',
+			'order'      => $config['order'] ?? 'ASC',
+		] );
+
+		if ( empty( $terms ) || is_wp_error( $terms ) ) {
+			$noTermsText = $config['text']['no_terms_text'] ?? __( 'No terms', 'wp-jarvis' );
+
+			return '<p class="' . self::CSS_PREFIX . '__no-terms">' . esc_html( $noTermsText ) . '</p>';
+		}
+
+		$wrapperClass = self::CSS_PREFIX . '__options';
+		if ( $inline ) {
+			$wrapperClass .= ' ' . self::CSS_PREFIX . '__options--inline';
+		}
+
+		$html = '<div class="' . esc_attr( $wrapperClass ) . '">';
+
+		foreach ( $terms as $term ) {
+			$termFieldId = $id . '_' . $term->term_id;
+			$checked     = in_array( $term->term_id, array_map( 'intval', $values ), true ) ? 'checked' : '';
+
+			$html .= '<div class="' . self::CSS_PREFIX . '__option">';
+			$html .= sprintf(
+				'<input type="checkbox" id="%s" name="%s[]" value="%d" %s />',
+				esc_attr( $termFieldId ),
+				esc_attr( $name ),
+				$term->term_id,
+				$checked
+			);
+			$html .= sprintf( '<label for="%s">%s</label>', esc_attr( $termFieldId ), esc_html( $term->name ) );
+			$html .= '</div>';
+		}
+
+		$html .= '</div>';
+
+		return $html;
+	}
+
+	/**
+	 * Sanitize a field value for storage.
+	 *
+	 * @param mixed $value Input value to sanitize.
+	 * @param array<string, mixed> $config Field configuration.
+	 *
+	 * @return array<int> Sanitized term IDs.
+	 */
+	public function sanitize( mixed $value, array $config ): array {
+		if ( ! is_array( $value ) ) {
+			return [];
+		}
+
+		return array_map( 'absint', $value );
+	}
+
+	/**
+	 * Get the field's default value.
+	 *
+	 * @param array<string, mixed> $config Field configuration.
+	 *
+	 * @return array<int> The default value.
+	 */
+	public function getDefault( array $config ): mixed {
+		return $config['default'] ?? [];
+	}
+}

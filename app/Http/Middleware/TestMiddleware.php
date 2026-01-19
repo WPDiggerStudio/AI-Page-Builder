@@ -1,0 +1,80 @@
+<?php
+
+declare(strict_types=1);
+
+namespace BraCalculator\App\Http\Middleware;
+
+/**
+ * TestMiddleware Middleware
+ *
+ * Handles HTTP request filtering.
+ *
+ * @package BraCalculator\App\Http\Middleware
+ */
+class TestMiddleware
+{
+    /**
+     * Handle an incoming request.
+     *
+     * @param mixed $request The request object.
+     * @param \Closure $next The next middleware.
+     * @return mixed
+     */
+    public function handle(mixed $request, \Closure $next): mixed
+    {
+        // Perform action before request is handled
+        // Example: Check authentication, permissions, etc.
+
+        if (!$this->passesCheck($request)) {
+            return $this->unauthorized();
+        }
+
+        // Pass to next middleware
+        $response = $next($request);
+
+        // Perform action after request is handled
+        // Example: Add headers, log response, etc.
+
+        return $response;
+    }
+
+    /**
+     * Determine if the request passes the check.
+     *
+     * @param mixed $request
+     * @return bool
+     */
+    protected function passesCheck(mixed $request): bool
+    {
+        // Your logic here
+        return true;
+    }
+
+    /**
+     * Return unauthorized response.
+     *
+     * @return \WP_Error
+     */
+    protected function unauthorized(): \WP_Error
+    {
+        return new \WP_Error(
+            'unauthorized',
+            __('You are not authorized to access this resource.', 'bra-calculator'),
+            ['status' => 401]
+        );
+    }
+
+    /**
+     * Terminate the middleware.
+     *
+     * Called after response is sent to browser.
+     *
+     * @param mixed $request
+     * @param mixed $response
+     * @return void
+     */
+    public function terminate(mixed $request, mixed $response): void
+    {
+        // Cleanup or logging after response sent
+    }
+}

@@ -1,0 +1,13 @@
+/**
+ * Block: {{ block_title }} - Frontend Styles
+ *
+ * These styles apply to both the editor and the frontend.
+ *
+ * @see https://developer.wordpress.org/block-editor/getting-started/fundamentals/block-wrapper/#styling-blocks-in-the-editor-and-on-the-front-end
+ * @package {{ namespace }}
+ */
+
+.wp-block-{{ block_namespace }}-{{ block_slug }} {
+    /* Add frontend styles here */
+    padding: 1rem;
+}

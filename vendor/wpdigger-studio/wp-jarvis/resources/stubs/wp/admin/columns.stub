@@ -1,0 +1,111 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ namespace }};
+
+use WPJarvis\Framework\Support\Facades\Hooks;
+use WPJarvis\Framework\WP\Admin\Columns as ColumnsBuilder;
+
+/**
+ * {{ class }} Admin Columns
+ *
+ * Manages admin list table columns for {{ post_type }}.
+ *
+ * @package {{ namespace }}
+ */
+class {{ class }}
+{
+    /**
+     * The post-type.
+     */
+    public const POST_TYPE = '{{ post_type }}';
+
+    /**
+     * Register the columns.
+     */
+    public function register(): void
+    {
+        ColumnsBuilder::for(self::POST_TYPE)
+            // Add a thumbnail column after the checkbox
+            ->after('cb', 'thumbnail', __('Image', '{{ textdomain }}'), function (int $postId) {
+                if (has_post_thumbnail($postId)) {
+                    echo get_the_post_thumbnail($postId, [50, 50], [
+                        'style' => 'border-radius: 4px;'
+                    ]);
+                } else {
+                    echo '<span class="dashicons dashicons-format-image" style="color:#ccc;font-size:32px;"></span>';
+                }
+            })
+
+            // Add a custom meta column
+            ->after('title', 'custom_field', __('Custom Field', '{{ textdomain }}'), function (int $postId) {
+                $value = get_post_meta($postId, '_custom_field', true);
+                echo esc_html($value ?: '—');
+            })
+
+            // Add a status column with a visual indicator
+            ->add('status', __('Status', '{{ textdomain }}'), function (int $postId) {
+                $status = get_post_meta($postId, '_status', true);
+                $statusLabels = [
+                    'active' => ['label' => __('Active', '{{ textdomain }}'), 'color' => '#00a32a'],
+                    'inactive' => ['label' => __('Inactive', '{{ textdomain }}'), 'color' => '#d63638'],
+                    'pending' => ['label' => __('Pending', '{{ textdomain }}'), 'color' => '#dba617'],
+                ];
+
+                $info = $statusLabels[$status] ?? ['label' => __('Unknown', '{{ textdomain }}'), 'color' => '#666'];
+                printf(
+                    '<span style="display:inline-flex;align-items:center;gap:4px;">
+                        <span style="width:8px;height:8px;border-radius:50%%;background:%s;"></span>
+                        %s
+                    </span>',
+                    esc_attr($info['color']),
+                    esc_html($info['label'])
+                );
+            })
+
+            // Add a featured indicator
+            ->boolean('featured', __('Featured', '{{ textdomain }}'), '_featured', '★', '—')
+
+            // Add taxonomy column
+            // ->taxonomy('categories', __('Categories', '{{ textdomain }}'), 'category')
+
+            // Make columns sortable
+            ->sortable('custom_field', '_custom_field')
+
+            // Remove unwanted columns
+            // ->remove('comments')
+            // ->remove('author')
+
+            ->register();
+    }
+
+    /**
+     * Add custom styles for the columns.
+     */
+    public function enqueueStyles(): void
+    {
+        $screen = get_current_screen();
+
+        if ($screen && $screen->id === 'edit-' . self::POST_TYPE) {
+            Hooks::action('admin_head', function () {
+                ?>
+                <style>
+                    .column-thumbnail { width: 60px; }
+                    .column-featured { width: 80px; text-align: center; }
+                    .column-status { width: 100px; }
+                    .column-custom_field { width: 150px; }
+                </style>
+                <?php
+            });
+        }
+    }
+
+    /**
+     * Register column styles hook.
+     */
+    public function registerStyles(): void
+    {
+        Hooks::action(('current_screen', [$this, 'enqueueStyles']);
+    }
+}

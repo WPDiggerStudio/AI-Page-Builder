@@ -1,0 +1,152 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ namespace }};
+
+use WPJarvis\Framework\WP\Frontend\Shortcode as ShortcodeBuilder;
+
+/**
+ * {{ class }} Shortcode (Simple Mode)
+ *
+ * Provides [{{ shortcode_tag }}] shortcode using the fluent builder pattern.
+ * This is the lightweight version without base class extension.
+ *
+ * Usage:
+ *   [{{ shortcode_tag }} attr="value"]
+ *   {{ shortcode_with_content }}
+ *
+ * @package {{ namespace }}
+ */
+class {{ class }}
+{
+    /**
+     * The shortcode tag.
+     */
+    public const TAG = '{{ shortcode_tag }}';
+
+    /**
+     * Default attributes.
+     *
+     * @var array<string, mixed>
+     */
+    protected array $defaults = [
+        'id' => '',
+        'class' => '',
+        'title' => '',
+{{ default_definitions }}
+    ];
+
+    /**
+     * Register the shortcode.
+     *
+     * @return void
+     */
+    public function register(): void
+    {
+        ShortcodeBuilder::make(self::TAG)
+            ->defaults($this->defaults)
+            ->allowContent({{ allow_content }})
+            ->render([$this, 'render'])
+            ->register();
+    }
+
+    /**
+     * Render shortcode output.
+     *
+     * @param array<string, mixed> $atts Shortcode attributes.
+     * @param string|null $content Shortcode content.
+     * @param string $tag Shortcode tag.
+     * @return string Rendered HTML.
+     */
+    public function render(array $atts, ?string $content = null, string $tag = ''): string
+    {
+        // Build CSS classes
+        $classes = ['{{ shortcode_tag }}-shortcode'];
+        if (!empty($atts['class'])) {
+            $classes[] = esc_attr($atts['class']);
+        }
+
+        // Build attributes
+        $attributes = [
+            'class' => implode(' ', $classes),
+        ];
+
+        if (!empty($atts['id'])) {
+            $attributes['id'] = esc_attr($atts['id']);
+        }
+
+        // Build attribute string
+        $attrString = '';
+        foreach ($attributes as $key => $value) {
+            $attrString .= sprintf(' %s="%s"', $key, $value);
+        }
+
+        // Start output
+        $output = '<div' . $attrString . '>';
+
+        // Title
+        if (!empty($atts['title'])) {
+            $output .= '<h3 class="{{ shortcode_tag }}-title">' . esc_html($atts['title']) . '</h3>';
+        }
+
+        // Content
+        if ($content !== null) {
+            $output .= '<div class="{{ shortcode_tag }}-content">';
+            $output .= do_shortcode($content);
+            $output .= '</div>';
+        }
+
+        $output .= '</div>';
+
+        return $output;
+    }
+
+    /**
+     * Get shortcode tag.
+     *
+     * @return string
+     */
+    public static function tag(): string
+    {
+        return self::TAG;
+    }
+
+    /**
+     * Render shortcode programmatically.
+     *
+     * @param array<string, mixed> $atts Attributes.
+     * @param string|null $content Content.
+     * @return string Rendered HTML.
+     */
+    public static function output(array $atts = [], ?string $content = null): string
+    {
+        return do_shortcode(self::buildTag($atts, $content));
+    }
+
+    /**
+     * Build a shortcode tag string.
+     *
+     * @param array<string, mixed> $atts Attributes.
+     * @param string|null $content Content.
+     * @return string
+     */
+    public static function buildTag(array $atts = [], ?string $content = null): string
+    {
+        $tag = '[' . self::TAG;
+
+        foreach ($atts as $key => $value) {
+            if ($value !== '' && $value !== null) {
+                $tag .= sprintf(' %s="%s"', $key, esc_attr((string) $value));
+            }
+        }
+
+        $tag .= ']';
+
+        if ($content !== null) {
+            $tag .= $content . '[/' . self::TAG . ']';
+        }
+
+        return $tag;
+    }
+}

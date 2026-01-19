@@ -1,0 +1,13 @@
+/**
+ * Block: {{ block_title }} - Editor Styles
+ *
+ * These styles apply only to the editor.
+ *
+ * @see https://developer.wordpress.org/block-editor/getting-started/fundamentals/block-wrapper/#styling-blocks-in-the-editor-only
+ * @package {{ namespace }}
+ */
+
+.wp-block-{{ block_namespace }}-{{ block_slug }} {
+    /* Add editor-only styles here */
+    border: 1px dashed #ccc;
+}

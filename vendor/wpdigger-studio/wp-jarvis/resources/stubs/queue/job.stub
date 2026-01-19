@@ -1,0 +1,149 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ namespace }};
+
+use WPJarvis\Framework\Queue\Job as BaseJob;
+
+/**
+ * {{ class }} Job
+ *
+ * A queued job for background processing.
+ *
+ * @package {{ namespace }}
+ */
+class {{ class }} extends BaseJob
+{
+    /**
+     * The number of times the job may be attempted.
+     */
+    public int $tries = 3;
+
+    /**
+     * The maximum number of seconds the job can run.
+     */
+    public int $timeout = 60;
+
+    /**
+     * The number of seconds to wait before retrying.
+     */
+    public int $retryAfter = 60;
+
+    /**
+     * Job data.
+     *
+     * @var array<string, mixed>
+     */
+    protected array $data;
+
+    /**
+     * Create a new job instance.
+     *
+     * @param array<string, mixed> $data Job data.
+     */
+    public function __construct(array $data = [])
+    {
+        $this->data = $data;
+    }
+
+    /**
+     * Execute the job.
+     *
+     * @return void
+     */
+    public function handle(): void
+    {
+        // Your job logic here
+        // Access data: $this->data['key']
+
+        try {
+            $this->process();
+        } catch (\Throwable $e) {
+            $this->fail($e);
+        }
+    }
+
+    /**
+     * Process the job.
+     *
+     * @return void
+     */
+    protected function process(): void
+    {
+        // Implement your processing logic here
+    }
+
+    /**
+     * Handle a job failure.
+     *
+     * @param \Throwable $exception
+     * @return void
+     */
+    public function failed(\Throwable $exception): void
+    {
+        // Log the failure
+        error_log(sprintf(
+            '[Job Failed] %s: %s',
+            static::class,
+            $exception->getMessage()
+        ));
+
+        // Optionally notify admin
+        // wp_mail(get_option('admin_email'), 'Job Failed', $exception->getMessage());
+
+        // Fire failed event
+        do_action('wpjarvis_job_failed', $this, $exception);
+    }
+
+    /**
+     * Dispatch the job.
+     *
+     * @param array<string, mixed> $data Job data.
+     * @return string Job ID.
+     */
+    public static function dispatch(array $data = []): string
+    {
+        $job = new static($data);
+
+        if (function_exists('app') && app()->bound('queue')) {
+            return app('queue')->push($job);
+        }
+
+        // Fallback to sync execution
+        $job->handle();
+        return 'sync-' . uniqid();
+    }
+
+    /**
+     * Dispatch the job after a delay.
+     *
+     * @param int $delay Delay in seconds.
+     * @param array<string, mixed> $data Job data.
+     * @return string Job ID.
+     */
+    public static function dispatchAfter(int $delay, array $data = []): string
+    {
+        $job = new static($data);
+
+        if (function_exists('app') && app()->bound('queue')) {
+            return app('queue')->later($delay, $job);
+        }
+
+        // Fallback to WP-Cron
+        wp_schedule_single_event(time() + $delay, 'wpjarvis_run_job', [serialize($job)]);
+        return 'cron-' . uniqid();
+    }
+
+    /**
+     * Get job data.
+     *
+     * @param string $key
+     * @param mixed $default
+     * @return mixed
+     */
+    protected function get(string $key, mixed $default = null): mixed
+    {
+        return $this->data[$key] ?? $default;
+    }
+}

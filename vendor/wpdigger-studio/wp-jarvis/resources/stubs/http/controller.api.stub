@@ -1,0 +1,301 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ namespace }};
+
+use WPJarvis\Framework\Http\Controller as BaseController;
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+
+/**
+ * {{ class }}
+ *
+ * API Controller for handling RESTful requests.
+ *
+ * @package {{ namespace }}
+ */
+class {{ class }} extends BaseController
+{
+    /**
+     * The namespace for the API routes.
+     */
+    protected string $namespace = 'wpjarvis/v1';
+
+    /**
+     * The REST base for these routes.
+     */
+    protected string $restBase = '{{ slug }}';
+
+    /**
+     * Register the routes for the API.
+     */
+    public function registerRoutes(): void
+    {
+        register_rest_route($this->namespace, '/' . $this->restBase, [
+            [
+                'methods' => \WP_REST_Server::READABLE,
+                'callback' => [$this, 'index'],
+                'permission_callback' => [$this, 'canRead'],
+            ],
+            [
+                'methods' => \WP_REST_Server::CREATABLE,
+                'callback' => [$this, 'store'],
+                'permission_callback' => [$this, 'canCreate'],
+            ],
+        ]);
+
+        register_rest_route($this->namespace, '/' . $this->restBase . '/(?P<id>[\d]+)', [
+            [
+                'methods' => \WP_REST_Server::READABLE,
+                'callback' => [$this, 'show'],
+                'permission_callback' => [$this, 'canRead'],
+                'args' => [
+                    'id' => [
+                        'validate_callback' => fn($param) => is_numeric($param),
+                    ],
+                ],
+            ],
+            [
+                'methods' => \WP_REST_Server::EDITABLE,
+                'callback' => [$this, 'update'],
+                'permission_callback' => [$this, 'canUpdate'],
+            ],
+            [
+                'methods' => \WP_REST_Server::DELETABLE,
+                'callback' => [$this, 'destroy'],
+                'permission_callback' => [$this, 'canDelete'],
+            ],
+        ]);
+    }
+
+    /**
+     * Get all resources.
+     *
+     * @param \WP_REST_Request $request
+     * @return \WP_REST_Response|\WP_Error
+     */
+    public function index(\WP_REST_Request $request): \WP_REST_Response|\WP_Error
+    {
+        $page = (int) $request->get_param('page') ?: 1;
+        $perPage = (int) $request->get_param('per_page') ?: 10;
+
+        // Your query logic here
+        $items = [];
+        $total = 0;
+
+        return $this->paginated($items, $total, $page, $perPage);
+    }
+
+    /**
+     * Get a single resource.
+     *
+     * @param \WP_REST_Request $request
+     * @return \WP_REST_Response|\WP_Error
+     */
+    public function show(\WP_REST_Request $request): \WP_REST_Response|\WP_Error
+    {
+        $id = (int) $request->get_param('id');
+
+        // Your find logic here
+        $item = null;
+
+        if (!$item) {
+            return $this->notFound(__('Resource not found.', '{{ textdomain }}'));
+        }
+
+        return $this->success($item);
+    }
+
+    /**
+     * Create a new resource.
+     *
+     * @param \WP_REST_Request $request
+     * @return \WP_REST_Response|\WP_Error
+     */
+    public function store(\WP_REST_Request $request): \WP_REST_Response|\WP_Error
+    {
+        // Validate the request
+        $validation = $this->validate($request, [
+            'name' => 'required',
+        ]);
+
+        if (is_wp_error($validation)) {
+            return $validation;
+        }
+
+        // Your create logic here
+        $item = [];
+
+        return $this->created($item);
+    }
+
+    /**
+     * Update a resource.
+     *
+     * @param \WP_REST_Request $request
+     * @return \WP_REST_Response|\WP_Error
+     */
+    public function update(\WP_REST_Request $request): \WP_REST_Response|\WP_Error
+    {
+        $id = (int) $request->get_param('id');
+
+        // Your update logic here
+        $item = null;
+
+        if (!$item) {
+            return $this->notFound(__('Resource not found.', '{{ textdomain }}'));
+        }
+
+        return $this->success($item);
+    }
+
+    /**
+     * Delete a resource.
+     *
+     * @param \WP_REST_Request $request
+     * @return \WP_REST_Response|\WP_Error
+     */
+    public function destroy(\WP_REST_Request $request): \WP_REST_Response|\WP_Error
+    {
+        $id = (int) $request->get_param('id');
+
+        // Your delete logic here
+
+        return $this->noContent();
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Permission Callbacks
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Check if user can read.
+     */
+    public function canRead(\WP_REST_Request $request): bool
+    {
+        return true; // Public by default
+    }
+
+    /**
+     * Check if user can create.
+     */
+    public function canCreate(\WP_REST_Request $request): bool
+    {
+        return current_user_can('edit_posts');
+    }
+
+    /**
+     * Check if user can update.
+     */
+    public function canUpdate(\WP_REST_Request $request): bool
+    {
+        return current_user_can('edit_posts');
+    }
+
+    /**
+     * Check if user can delete.
+     */
+    public function canDelete(\WP_REST_Request $request): bool
+    {
+        return current_user_can('delete_posts');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Response Helpers
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Return a success response.
+     */
+    protected function success(mixed $data, int $status = 200): \WP_REST_Response
+    {
+        return new \WP_REST_Response([
+            'success' => true,
+            'data' => $data,
+        ], $status);
+    }
+
+    /**
+     * Return a created response.
+     */
+    protected function created(mixed $data): \WP_REST_Response
+    {
+        return $this->success($data, 201);
+    }
+
+    /**
+     * Return a no content response.
+     */
+    protected function noContent(): \WP_REST_Response
+    {
+        return new \WP_REST_Response(null, 204);
+    }
+
+    /**
+     * Return a not found error.
+     */
+    protected function notFound(string $message = 'Not found'): \WP_Error
+    {
+        return new \WP_Error('not_found', $message, ['status' => 404]);
+    }
+
+    /**
+     * Return a paginated response.
+     */
+    protected function paginated(array $items, int $total, int $page, int $perPage): \WP_REST_Response
+    {
+        $response = new \WP_REST_Response([
+            'success' => true,
+            'data' => $items,
+            'meta' => [
+                'total' => $total,
+                'page' => $page,
+                'per_page' => $perPage,
+                'total_pages' => ceil($total / $perPage),
+            ],
+        ], 200);
+
+        $response->header('X-WP-Total', $total);
+        $response->header('X-WP-TotalPages', ceil($total / $perPage));
+
+        return $response;
+    }
+
+    /**
+     * Validate request data.
+     */
+    protected function validate(\WP_REST_Request $request, array $rules): array|\WP_Error
+    {
+        $data = [];
+        $errors = [];
+
+        foreach ($rules as $field => $rule) {
+            $value = $request->get_param($field);
+            $ruleList = is_string($rule) ? explode('|', $rule) : (array) $rule;
+
+            foreach ($ruleList as $r) {
+                if ($r === 'required' && empty($value)) {
+                    $errors[$field] = sprintf(__('%s is required.', '{{ textdomain }}'), $field);
+                    break;
+                }
+            }
+
+            $data[$field] = $value;
+        }
+
+        if (!empty($errors)) {
+            return new \WP_Error(
+                'validation_error',
+                __('Validation failed.', '{{ textdomain }}'),
+                ['status' => 422, 'errors' => $errors]
+            );
+        }
+
+        return $data;
+    }
+}

@@ -1,0 +1,102 @@
+<?php
+
+declare(strict_types=1);
+
+namespace BraCalculator\App\Providers;
+
+use WPJarvis\Framework\Foundation\ServiceProvider;
+
+/**
+ * TestProvider
+ *
+ * Service provider for registering services and bootstrapping functionality.
+ *
+ * @package BraCalculator\App\Providers
+ */
+class TestProvider extends ServiceProvider
+{
+    /**
+     * Services to register.
+     *
+     * @var array<string, string>
+     */
+    protected array $bindings = [
+        // 'abstract' => 'concrete',
+    ];
+
+    /**
+     * Singleton services.
+     *
+     * @var array<string, string>
+     */
+    protected array $singletons = [
+        // 'abstract' => 'concrete',
+    ];
+
+    /**
+     * Register any application services.
+     *
+     * This method is called before the application has booted.
+     * Use this for registering bindings in the container.
+     */
+    public function register(): void
+    {
+        // Register bindings
+        foreach ($this->bindings as $abstract => $concrete) {
+            $this->app->bind($abstract, $concrete);
+        }
+
+        // Register singletons
+        foreach ($this->singletons as $abstract => $concrete) {
+            $this->app->singleton($abstract, $concrete);
+        }
+
+        // Merge configuration
+        // $this->mergeConfigFrom(__DIR__ . '/../Config/config.php', 'test-provider');
+    }
+
+    /**
+     * Bootstrap any application services.
+     *
+     * This method is called after all service providers have registered.
+     * Use this for bootstrapping functionality like registering hooks.
+     */
+    public function boot(): void
+    {
+        // Register WordPress hooks
+        $this->registerHooks();
+
+        // Load views
+        // $this->loadViewsFrom(__DIR__ . '/../Views', 'test-provider');
+
+        // Load routes
+        // $this->loadRoutesFrom(__DIR__ . '/../Routes/api.php');
+
+        // Publish configuration (for vendor packages)
+        // $this->publishes([
+        //     __DIR__ . '/../Config/config.php' => config_path('test-provider.php'),
+        // ], 'test-provider-config');
+    }
+
+    /**
+     * Register WordPress hooks.
+     */
+    protected function registerHooks(): void
+    {
+        // Register on appropriate WordPress hooks
+        // add_action('init', [$this, 'onInit']);
+        // add_action('admin_init', [$this, 'onAdminInit']);
+        // add_action('wp_enqueue_scripts', [$this, 'enqueueAssets']);
+        // add_action('admin_enqueue_scripts', [$this, 'enqueueAdminAssets']);
+    }
+
+    /**
+     * Get the services provided by the provider.
+     *
+     * @return array<string>
+     */
+    public function provides(): array
+    {
+        return array_keys($this->bindings + $this->singletons);
+    }
+}
