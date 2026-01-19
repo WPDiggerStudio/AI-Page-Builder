@@ -193,10 +193,8 @@ class Application implements IlluminateApplication, \ArrayAccess
 		// Register console kernel
 		$this->registerConsoleKernel();
 
-        // Register dummy bindings for DB to prevent Facade crashes until fully implemented
-        $this->singleton('db', function () {
-            return new \stdClass(); // Placeholder
-        });
+        // Register database provider
+        $this->register(\WPJarvis\Framework\Providers\DatabaseServiceProvider::class);
 	}
 
 	/**
