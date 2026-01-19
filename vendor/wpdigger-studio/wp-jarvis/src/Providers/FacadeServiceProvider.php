@@ -57,7 +57,7 @@ class FacadeServiceProvider extends ServiceProvider {
 	 */
 	public function register(): void {
 		// Set the facade application
-		Facade::setFacadeApplication( $this->app );
+		// Facade::setFacadeApplication( $this->app );
 	}
 
 	/**

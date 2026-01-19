@@ -24,17 +24,25 @@ use Illuminate\View\Factory as ViewFactory;
 use Illuminate\View\FileViewFinder;
 use Psr\Log\LoggerInterface;
 use WPJarvis\Framework\Console\Kernel;
+use ReflectionClass;
 
 /**
  * Application
  *
  * The main application container for WP Jarvis framework.
- * Extends Laravel's Container with WordPress-specific functionality.
+ * Composes Laravel's Container with WordPress-specific functionality.
  *
  * @package WPJarvis\Framework
  */
-class Application extends Container implements IlluminateApplication
+class Application implements IlluminateApplication, \ArrayAccess
 {
+	/**
+	 * The internal container instance.
+	 *
+	 * @var Container
+	 */
+	private Container $container;
+
 	/**
 	 * The WP Jarvis framework version.
 	 *
@@ -128,6 +136,8 @@ class Application extends Container implements IlluminateApplication
 	 */
 	public function __construct(?string $basePath = null)
 	{
+		$this->container = new Container();
+
 		if ($basePath) {
 			$this->setBasePath($basePath);
 		}
@@ -157,10 +167,10 @@ class Application extends Container implements IlluminateApplication
 	 */
 	protected function registerBaseBindings(): void
 	{
-		static::setInstance($this);
+		// static::setInstance($this); // REMOVED
 
 		$this->instance('app', $this);
-		$this->instance(Container::class, $this);
+		$this->instance(Container::class, $this->container);
 		$this->instance(self::class, $this);
 	}
 
@@ -1200,14 +1210,12 @@ class Application extends Container implements IlluminateApplication
 	 */
 	public function flush(): void
 	{
-		parent::flush();
+		$this->container->flush();
 
-		$this->buildStack = [];
 		$this->loadedProviders = [];
 		$this->bootedCallbacks = [];
 		$this->bootingCallbacks = [];
 		$this->deferredServices = [];
-		$this->reboundCallbacks = [];
 		$this->serviceProviders = [];
 		$this->terminatingCallbacks = [];
 	}
@@ -1225,10 +1233,19 @@ class Application extends Container implements IlluminateApplication
 	 *
 	 * @return mixed             The stored instance value or the provided default.
 	 */
-	public function instanceValue(string $key, mixed $default = null): mixed
-	{
-		return $this->instances[$key] ?? $default;
-	}
+    public function instanceValue(string $key, mixed $default = null): mixed
+    {
+        // Use reflection to access protected instances property of the composed container
+        try {
+            $reflection = new ReflectionClass($this->container);
+            $property = $reflection->getProperty('instances');
+            $property->setAccessible(true);
+            $instances = $property->getValue($this->container);
+            return $instances[$key] ?? $default;
+        } catch (\ReflectionException $e) {
+            return $default;
+        }
+    }
 
 	// =========================================================================
 	// ENVIRONMENT METHODS
@@ -1598,7 +1615,7 @@ class Application extends Container implements IlluminateApplication
 			unset($this->deferredServices[$abstract]);
 		}
 
-		return parent::make($abstract, $parameters);
+		return $this->container->make($abstract, $parameters);
 	}
 
 	/**
@@ -1894,4 +1911,144 @@ class Application extends Container implements IlluminateApplication
 	{
 		return $this->make('hooks')?->getAllWordPressHooks();
 	}
+
+    /**
+     * Get the internal container instance.
+     *
+     * @return Container
+     */
+    public function container(): Container
+    {
+        return $this->container;
+    }
+
+    // =========================================================================
+    // CONTAINER PROXY METHODS
+    // =========================================================================
+
+    public function bind($abstract, $concrete = null, $shared = false)
+    {
+        $this->container->bind($abstract, $concrete, $shared);
+    }
+
+    public function bindIf($abstract, $concrete = null, $shared = false)
+    {
+        $this->container->bindIf($abstract, $concrete, $shared);
+    }
+
+    public function singleton($abstract, $concrete = null)
+    {
+        $this->container->singleton($abstract, $concrete);
+    }
+
+    public function scoped($abstract, $concrete = null)
+    {
+        if (method_exists($this->container, 'scoped')) {
+             $this->container->scoped($abstract, $concrete);
+        } else {
+             $this->container->singleton($abstract, $concrete);
+        }
+    }
+
+    public function extend($abstract, \Closure $closure)
+    {
+        $this->container->extend($abstract, $closure);
+    }
+
+    public function instance($abstract, $instance)
+    {
+        return $this->container->instance($abstract, $instance);
+    }
+
+    public function tag($abstracts, $tags)
+    {
+        $this->container->tag($abstracts, $tags);
+    }
+
+    public function when($concrete)
+    {
+        return $this->container->when($concrete);
+    }
+
+    public function factory($abstract)
+    {
+        return $this->container->factory($abstract);
+    }
+
+    public function call($callback, array $parameters = [], $defaultMethod = null)
+    {
+        return $this->container->call($callback, $parameters, $defaultMethod);
+    }
+
+    public function resolved($abstract)
+    {
+        return $this->container->resolved($abstract);
+    }
+
+    public function resolving($abstract, $callback = null)
+    {
+        $this->container->resolving($abstract, $callback);
+    }
+
+    public function afterResolving($abstract, $callback = null)
+    {
+        $this->container->afterResolving($abstract, $callback);
+    }
+
+    public function bound($abstract)
+    {
+        return $this->container->bound($abstract);
+    }
+
+    public function alias($abstract, $alias)
+    {
+        $this->container->alias($abstract, $alias);
+    }
+
+    public function isShared($abstract)
+    {
+        return $this->container->isShared($abstract);
+    }
+
+    public function isAlias($name)
+    {
+        return $this->container->isAlias($name);
+    }
+
+    public function addContextualBinding($concrete, $abstract, $implementation)
+    {
+        $this->container->addContextualBinding($concrete, $abstract, $implementation);
+    }
+
+    public function getBindings()
+    {
+        return $this->container->getBindings();
+    }
+
+    // ArrayAccess methods
+    public function offsetExists($key): bool
+    {
+        return $this->container->offsetExists($key);
+    }
+
+    public function offsetGet($key): mixed
+    {
+        return $this->container->offsetGet($key);
+    }
+
+    public function offsetSet($key, $value): void
+    {
+        $this->container->offsetSet($key, $value);
+    }
+
+    public function offsetUnset($key): void
+    {
+        $this->container->offsetUnset($key);
+    }
+
+    // Magic __call to delegate everything else
+    public function __call($method, $parameters)
+    {
+        return $this->container->$method(...$parameters);
+    }
 }
