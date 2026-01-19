@@ -5,6 +5,7 @@ declare( strict_types=1 );
 use Dotenv\Dotenv;
 use WPJarvis\Framework\Application;
 use WPJarvis\Framework\Foundation\Bootstrap;
+use WPJarvis\Framework\Support\AppRegistry;
 
 /*
 |--------------------------------------------------------------------------
@@ -174,7 +175,7 @@ try {
 */
 
 $GLOBALS[ str_replace( '-', '_', $_slug ) . '_app' ] = $app;
-$GLOBALS['wpjarvis_apps'][ $_slug ] = $app;
+AppRegistry::register($_slug, $app);
 
 /*
 |--------------------------------------------------------------------------
@@ -192,17 +193,17 @@ if ( ! function_exists( 'wpjarvis_app' ) ) {
      * @return Application|mixed|null
      */
     function wpjarvis_app( string $slug, ?string $abstract = null ): mixed {
-        $apps = $GLOBALS['wpjarvis_apps'] ?? [];
-
-        if ( ! isset( $apps[ $slug ] ) ) {
+        if ( ! AppRegistry::has( $slug ) ) {
             return null;
         }
 
+        $app = AppRegistry::get( $slug );
+
         if ( $abstract === null ) {
-            return $apps[ $slug ];
+            return $app;
         }
 
-        return $apps[ $slug ]->make( $abstract );
+        return $app->make( $abstract );
     }
 }
 

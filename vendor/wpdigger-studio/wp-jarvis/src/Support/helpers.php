@@ -13,6 +13,7 @@ declare( strict_types=1 );
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Contracts\View\View;
 use WPJarvis\Framework\Application;
+use WPJarvis\Framework\Support\AppRegistry;
 
 if ( ! function_exists( 'wpj_app' ) ) {
 	/**
@@ -20,16 +21,39 @@ if ( ! function_exists( 'wpj_app' ) ) {
 	 *
 	 * @param string|null $abstract
 	 * @param array<string, mixed> $parameters
+     * @param string|null $appKey
 	 *
 	 * @return mixed|Application
 	 * @throws \Illuminate\Contracts\Container\BindingResolutionException
 	 */
-	function wpj_app( ?string $abstract = null, array $parameters = [] ): mixed {
+	function wpj_app( ?string $abstract = null, array $parameters = [], ?string $appKey = null ): mixed {
+        // If appKey is provided, get that specific app
+        if ($appKey !== null) {
+            $app = AppRegistry::get($appKey);
+        } elseif (defined('WPJARVIS_CURRENT_APP_KEY')) {
+            // If inside a plugin context that defined the current app key
+            $app = AppRegistry::get(WPJARVIS_CURRENT_APP_KEY);
+        } else {
+            // Fallback: If only one app exists, return it
+            $apps = AppRegistry::all();
+            if (count($apps) === 1) {
+                $app = reset($apps);
+            } else {
+                // If abstract is provided, try to resolve it from the first app (legacy/fallback)
+                // or throw exception if multiple apps exist and context is ambiguous
+                 if (count($apps) > 1) {
+                     throw new \RuntimeException('Ambiguous wpj_app() call. Multiple WP Jarvis apps registered. Please provide $appKey.');
+                 }
+                 // If no apps registered yet, we can't do anything
+                 throw new \RuntimeException('No WP Jarvis application registered.');
+            }
+        }
+
 		if ( $abstract === null ) {
-			return Application::getInstance();
+			return $app;
 		}
 
-		return Application::getInstance()->make( $abstract, $parameters );
+		return $app->make( $abstract, $parameters );
 	}
 }
 
