@@ -16,8 +16,65 @@
  * ===============================================================================
  */
 
+use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Output\ConsoleOutput;
+use WPJarvis\Framework\Application;
+use WPJarvis\Framework\Support\AppRegistry;
+use WPJarvis\Framework\Contracts\Console\Kernel as KernelContract;
+
 // ===============================================================================
-// Environment Validation
+// WP-CLI Integration Mode
+// ===============================================================================
+
+if (defined('WP_CLI') && WP_CLI) {
+    WP_CLI::add_command('jarvis', function ($args, $assoc_args) {
+        // We need to determine WHICH plugin's app to run.
+        // For now, we'll try to find an app that matches the current directory
+        // or just use the first registered one.
+
+        $currentDir = getcwd();
+        $targetApp = null;
+
+        foreach (AppRegistry::all() as $app) {
+            if (str_starts_with($currentDir, $app->basePath())) {
+                $targetApp = $app;
+                break;
+            }
+        }
+
+        if (!$targetApp) {
+            // Fallback: use first available
+            $apps = AppRegistry::all();
+            if (!empty($apps)) {
+                $targetApp = reset($apps);
+            }
+        }
+
+        if (!$targetApp) {
+            WP_CLI::error("No active WP Jarvis application found. Make sure the plugin is active.");
+            return;
+        }
+
+        $kernel = $targetApp->make(KernelContract::class);
+
+        // Convert WP-CLI args back to argv format for Symfony Console
+        // This is a simplification; a robust bridge is better but complex.
+        // Simple shim:
+        $argv = ['jarvis', ...$args];
+        foreach ($assoc_args as $key => $value) {
+            $argv[] = "--{$key}={$value}";
+        }
+
+        $input = new ArgvInput($argv);
+        $output = new ConsoleOutput();
+
+        $kernel->handle($input, $output);
+    });
+    return;
+}
+
+// ===============================================================================
+// Standalone Mode (php jarvis)
 // ===============================================================================
 
 if (PHP_SAPI !== 'cli') {
@@ -70,18 +127,35 @@ foreach ($wpLoadPaths as $path) {
 }
 
 if ($wpLoadPath === null) {
-    fwrite(STDERR, sprintf(
-        "❌ Error: Could not locate WordPress core.\n\n" .
-        "Searched locations:\n%s\n\n" .
-        "Please ensure that CLI is run from within a valid WordPress directory structure,\n" .
-        "or run it from your WordPress root directory.\n",
-        implode("\n", array_map(fn($p) => "   - $p", $wpLoadPaths))
-    ));
-    exit(1);
-}
+    // Fallback: If no WP found, we might just be generating code.
+    // Try to load just composer autoload if present.
+    $autoloadPaths = [
+        __DIR__ . '/vendor/autoload.php',
+        __DIR__ . '/../vendor/autoload.php',
+        dirname(__DIR__) . '/vendor/autoload.php',
+    ];
 
-// Load WordPress core
-require_once $wpLoadPath;
+    $autoloadFile = null;
+    foreach ($autoloadPaths as $path) {
+        if (file_exists($path)) {
+            $autoloadFile = $path;
+            break;
+        }
+    }
+
+    if ($autoloadFile) {
+        require_once $autoloadFile;
+        // Proceed without WP (some commands might fail)
+    } else {
+        fwrite(STDERR, sprintf(
+            "❌ Error: Could not locate WordPress core or Composer autoload.\n"
+        ));
+        exit(1);
+    }
+} else {
+    // Load WordPress core
+    require_once $wpLoadPath;
+}
 
 // ===============================================================================
 // Dynamic Environment Adjustment
@@ -99,7 +173,7 @@ if (function_exists('home_url')) {
 }
 
 // ===============================================================================
-// Composer Autoloader
+// Composer Autoloader (Ensure loaded if WP didn't load plugin)
 // ===============================================================================
 
 // Determine possible locations of autoload file
@@ -117,15 +191,9 @@ foreach ($autoloadPaths as $path) {
     }
 }
 
-if ($autoloadFile === null) {
-    fwrite(STDERR,
-        "❌ Error: Composer autoload file not found.\n\n" .
-        "Please run 'composer install' in the plugin directory.\n"
-    );
-    exit(1);
+if ($autoloadFile && !class_exists(Application::class)) {
+    require_once $autoloadFile;
 }
-
-require_once $autoloadFile;
 
 // ===============================================================================
 // Load Environment Variables
@@ -139,12 +207,6 @@ if (class_exists(\Dotenv\Dotenv::class) && file_exists(__DIR__ . '/.env')) {
 // ===============================================================================
 // Application Bootstrap
 // ===============================================================================
-
-use Symfony\Component\Console\Input\ArgvInput;
-use Symfony\Component\Console\Output\ConsoleOutput;
-use WPJarvis\Framework\Application;
-use Illuminate\Support\Facades\Facade;
-use WPJarvis\Framework\Contracts\Console\Kernel as KernelContract;
 
 try {
     // Define plugin constants from .env values
@@ -175,9 +237,12 @@ try {
      */
     $app = new Application(WPJARVIS_DIR);
 
-    // Set facade application if available
-    if (class_exists(Facade::class)) {
-        Facade::setFacadeApplication($app);
+    // Register in registry
+    $slug = env('PLUGIN_SLUG', 'wp-jarvis');
+    AppRegistry::register($slug, $app);
+    // Set current app context for Facades
+    if (!defined('WPJARVIS_CURRENT_APP_KEY')) {
+        define('WPJARVIS_CURRENT_APP_KEY', $slug);
     }
 
     /**
@@ -188,7 +253,7 @@ try {
     $app->instance('plugin.file', WPJARVIS_FILE);
     $app->instance('plugin.dir', WPJARVIS_DIR);
     $app->instance('plugin.version', env('PLUGIN_VERSION', '1.0.0'));
-    $app->instance('plugin.slug', env('PLUGIN_SLUG', 'wp-jarvis'));
+    $app->instance('plugin.slug', $slug);
     $app->instance('plugin.name', env('PLUGIN_NAME', 'WP Jarvis App'));
 
     /**
